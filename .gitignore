@@ -1,2 +1,4 @@
 *.class
 *.lst
+/target/
+pom.xml

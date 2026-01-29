@@ -4,16 +4,19 @@ package yusvel.schedule;
 import Date.DatePicker;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
-import yusvel.schedule.employee.WindowEmployee;
+import yusvel.schedule.employee.WindowEmployeeCreator;
+
+
 public class Schedule {
 
-    public static void main(String[] args)  {
+    public static void main(String[] args) throws InterruptedException  {
         System.out.println("Hello World!");
   
      
-        WindowEmployee w = new WindowEmployee();
-       
         
+       Employee e = new Employee();
+       e.createNewEmployee();
+       
     /*
         JFrame window = new JFrame("sdsdfsdfsd");
         window.setLayout(null);

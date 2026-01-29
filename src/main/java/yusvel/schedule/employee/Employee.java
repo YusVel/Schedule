@@ -3,7 +3,7 @@ package yusvel.schedule.employee;
 import javax.swing.*;
 import java.awt.event.*;
 import java.util.Calendar;
-import yusvel.schedule.employee.WindowEmployee;
+import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
 public class Employee // Класс работник
@@ -45,7 +45,14 @@ public class Employee // Класс работник
       
    public Employee()
     {
-       
+       surname = "Surname";
+       name = "Name";
+       patronomic = "Patronomic";
+       bithDay = Calendar.getInstance();
+       workingRate = 1.0f;
+       post = POST_JOB[0];
+       department = DEPARTMENT_JOB[0];
+       beginEmployment = Calendar.getInstance();
     }
    
     public Employee(Employee one)
@@ -61,6 +68,13 @@ public class Employee // Класс работник
         this.department=one.department;
         this.beginEmployment = one.beginEmployment;
         this.endEmployment = endEmployment;  
+    }
+    //////////////Создание окна для заполнения полей///////////////////
+    public void createNewEmployee()
+    {
+        
+        new WindowEmployeeCreator(this);
+        
     }
     //СЕТТЕРЫ
    public void setSurname(String surname){

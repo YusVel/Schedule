@@ -7,7 +7,7 @@ import Date.DatePicker;
 import yusvel.schedule.employee.Employee;
 import java.util.Calendar;
 
-public class WindowEmployee extends JFrame implements ActionListener {
+public class WindowEmployeeCreator extends JFrame {
     Employee employee;
     JLabel surnameLabel;  
     JTextField surnameTextField;
@@ -25,7 +25,7 @@ public class WindowEmployee extends JFrame implements ActionListener {
     JComboBox<String> departmentList;
     JButton button;
     JPanel mainPanel;
-    public WindowEmployee() 
+    public  WindowEmployeeCreator(Employee employee) 
     {
         super("Добавить сотрудника");
         this.mainPanel = new JPanel();
@@ -46,8 +46,7 @@ public class WindowEmployee extends JFrame implements ActionListener {
         this.surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
         
         
-        this.employee = new Employee();
-        System.out.println("Constructor WINDOW");
+        System.out.println("Constructor WindowEmployeeCreator");
         Font F = new Font(Font.MONOSPACED,Font.BOLD,16);
         int w =350;
         int h = 340;
@@ -111,7 +110,19 @@ public class WindowEmployee extends JFrame implements ActionListener {
         
         //////////////////Кнопка////////////////////
      
-        button.addActionListener(this);
+        button.addActionListener(e->{
+                                        employee.setSurname(this.surnameTextField.getText());
+                                        employee.setName(nameTextField.getText());
+                                        employee.setPatronomic(patronomicTextField.getText());
+                                        employee.setBithDay(bithPiker.getDate());
+                                        employee.setPost((String)postList.getSelectedItem());
+                                        employee.setWorkingRate((Float)workingRateList.getSelectedItem());
+                                        employee.setDepartment((String)departmentList.getSelectedItem());
+                                        employee.setEndEmployment(Calendar.getInstance());
+                                        //System.out.println("Сотрудник создан в окне WindowEmployee!");
+                                        //System.out.println(employee.toString());
+                                        this.dispose();
+                                         });
         button.setBounds(110, 260, 120, 25);
      
         
@@ -140,20 +151,6 @@ public class WindowEmployee extends JFrame implements ActionListener {
     public Employee getEmployee()
     {
         return employee;
-    }
-    @Override
-    public void actionPerformed(ActionEvent e) {
-                                        employee.setSurname(this.surnameTextField.getText());
-                                        employee.setName(nameTextField.getText());
-                                        employee.setPatronomic(patronomicTextField.getText());
-                                        employee.setBithDay(bithPiker.getDate());
-                                        employee.setPost((String)postList.getSelectedItem());
-                                        employee.setWorkingRate((Float)workingRateList.getSelectedItem());
-                                        employee.setDepartment((String)departmentList.getSelectedItem());
-                                        employee.setEndEmployment(Calendar.getInstance());
-                                        System.out.println("Сотрудник создан в окне WindowEmployee!");
-                                        System.out.println(employee.toString());
-                                        //this.dispose();
     }
 
 }

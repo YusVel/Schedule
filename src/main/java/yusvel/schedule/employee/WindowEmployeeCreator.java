@@ -45,6 +45,7 @@ public class WindowEmployeeCreator extends JFrame {
         this.surnameTextField = new JTextField();
         this.surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
         
+        this.setEnabled(true);
         
         System.out.println("Constructor WindowEmployeeCreator");
         Font F = new Font(Font.MONOSPACED,Font.BOLD,16);
@@ -121,7 +122,8 @@ public class WindowEmployeeCreator extends JFrame {
                                         employee.setEndEmployment(Calendar.getInstance());
                                         //System.out.println("Сотрудник создан в окне WindowEmployee!");
                                         //System.out.println(employee.toString());
-                                        this.dispose();
+                                        this.setEnabled(false);
+                                        this.setVisible(false);
                                          });
         button.setBounds(110, 260, 120, 25);
      

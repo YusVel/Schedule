@@ -71,10 +71,9 @@ public class Employee // Класс работник
     }
     //////////////Создание окна для заполнения полей///////////////////
     public void createNewEmployee()
-    {
-        
-        new WindowEmployeeCreator(this);
-        
+    {   
+        WindowEmployeeCreator w = new WindowEmployeeCreator(this);
+       
     }
     //СЕТТЕРЫ
    public void setSurname(String surname){

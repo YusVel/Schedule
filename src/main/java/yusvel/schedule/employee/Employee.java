@@ -6,12 +6,13 @@ import java.util.Calendar;
 import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
-public class Employee // Класс работник
+public class Employee implements Comparable<Employee>// Класс работник
 {
-    
- public static final String[] POST_JOB = new String[]
+ 
+ public static final String[] POSTS = new String[]
 {
     "Хирург-стоматолог",
+    "Пародонтолог",
     "Терапевт-стоматолог",
     "Ортодонт",
     "Детский стоматолог",
@@ -19,10 +20,11 @@ public class Employee // Класс работник
     "Старшая мед.сестра",
     "Шлавная мед.сестра",
     "Заведующий отделением",
+    "Рентген-лаборант",
     "Начальник медицинской службы",
     "Главный врач"
 };
-  public static final String[] DEPARTMENT_JOB = new String[]
+  public static final String[] DEPARTMENTS = new String[]
 {
     "ОПО",
     "Лечебное отделение №1",
@@ -36,10 +38,11 @@ public class Employee // Класс работник
     private String patronomic;
     private Calendar bithDay;
     private Float workingRate;
-    private String post;
-    private String department;
+    private Byte post;
+    private Byte department;
     private Calendar beginEmployment;
     private Calendar endEmployment;
+    private Byte cabinetNumber;
     
     private boolean isEmployed;
       
@@ -50,11 +53,20 @@ public class Employee // Класс работник
        patronomic = "Patronomic";
        bithDay = Calendar.getInstance();
        workingRate = 1.0f;
-       post = POST_JOB[0];
-       department = DEPARTMENT_JOB[0];
+       post = 0;
+       department = 0;
        beginEmployment = Calendar.getInstance();
     }
-   
+    @Override
+    public int compareTo(Employee other) {
+        if(this.post.equals(other.post))
+        {
+            return other.cabinetNumber-this.cabinetNumber;
+        }
+        return other.post-this.post;
+    }
+    
+    
     public Employee(Employee one)
     {
         System.out.println("Constructor COPY");
@@ -70,11 +82,7 @@ public class Employee // Класс работник
         this.endEmployment = endEmployment;  
     }
     //////////////Создание окна для заполнения полей///////////////////
-    public void createNewEmployee()
-    {   
-        WindowEmployeeCreator w = new WindowEmployeeCreator(this);
-       
-    }
+
     //СЕТТЕРЫ
    public void setSurname(String surname){
         this.surname = surname;
@@ -93,11 +101,11 @@ public class Employee // Класс работник
     {
         this.workingRate = workingRate;
     }
-    public void setPost(String post)
+    public void setPost(Byte post)
     {
         this.post = post ;
     }
-    public void setDepartment(String department)
+    public void setDepartment(Byte department)
     {
         this.department = department;
     }
@@ -111,7 +119,10 @@ public class Employee // Класс работник
         this.endEmployment = endEmployment;
         isEmployed=false;
     }
-    
+    public void setCabinetNumber(Byte cabinetNumber)
+    {
+        this.cabinetNumber = cabinetNumber;
+    }
  
     ///ГЕТТЕР
     /// @return 
@@ -119,16 +130,15 @@ public class Employee // Класс работник
     {
         return String.format("%s %s %s ", surname,name,patronomic);
     }
-    public String getPost(){return post;}
+    public String getPost(){return POSTS[post];}
     
     @Override public String toString()
     {
         String result;
-        result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+post+" "+department;
+        result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+post+" "+department+'\n'+"Кабинет: "+cabinetNumber;
         return result;
     }
     
-
 }
 
 

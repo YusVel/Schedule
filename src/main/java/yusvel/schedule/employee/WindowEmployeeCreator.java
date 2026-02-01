@@ -7,8 +7,9 @@ import Date.DatePicker;
 import yusvel.schedule.employee.Employee;
 import java.util.Calendar;
 
-public class WindowEmployeeCreator extends JFrame {
+public class WindowEmployeeCreator  {
     Employee employee;
+    JFrame mainFraim;
     JLabel surnameLabel;  
     JTextField surnameTextField;
     JLabel nameLabel;
@@ -23,45 +24,50 @@ public class WindowEmployeeCreator extends JFrame {
     JComboBox<Float> workingRateList;
     JLabel departmentLabel;  
     JComboBox<String> departmentList;
-    JButton button;
+    JLabel cabinetNumberLabel;  
+    JComboBox<Byte> cabinetNumberList;
+    JButton buttonCreate;
     JPanel mainPanel;
-    public  WindowEmployeeCreator(Employee employee) 
+    
+    Font F = new Font(Font.MONOSPACED,Font.BOLD,16);
+    int w =350;
+    int h = 340;
+    
+     public  WindowEmployeeCreator()
     {
-        super("Добавить сотрудника");
-        this.mainPanel = new JPanel();
-        this.button = new JButton("OK");
-        this.departmentList = new JComboBox(Employee.DEPARTMENT_JOB);
-        this.departmentLabel = new JLabel("Отделение: ",JLabel.RIGHT);
-        this.workingRateList = new JComboBox(new Float[]{1.0f,0.75f,0.5f,0.25f});
-        this.workingRateLabel = new JLabel("Ставка: ",JLabel.RIGHT);
-        this.postList = new JComboBox(Employee.POST_JOB);
-        this.postLabel = new JLabel("Должность: ",JLabel.RIGHT);
-        this.bithPiker = new DatePicker();
-        this.bithDayLabel = new JLabel("Дата рожденье: ",JLabel.RIGHT);
-        this.patronomicTextField = new JTextField();
-        this.patronomicLabel = new JLabel("Отчество: ",JLabel.RIGHT);
-        this.nameTextField = new JTextField();
-        this.nameLabel = new JLabel("Имя: ",JLabel.RIGHT);
-        this.surnameTextField = new JTextField();
-        this.surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
-        
-        this.setEnabled(true);
-        
         System.out.println("Constructor WindowEmployeeCreator");
-        Font F = new Font(Font.MONOSPACED,Font.BOLD,16);
-        int w =350;
-        int h = 340;
-   
-        ///////////////////////////////////WInDOW///////////////////////////////////
+        mainFraim = new JFrame();
+        mainPanel = new JPanel();
+        buttonCreate = new JButton("Создать");
+        cabinetNumberLabel = new JLabel("№ Кабинета: ",JLabel.RIGHT);
+        cabinetNumberList = new JComboBox(new Byte[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
+        departmentList = new JComboBox(Employee.DEPARTMENTS);
+        departmentLabel = new JLabel("Отделение: ",JLabel.RIGHT);
+        workingRateList = new JComboBox(new Float[]{1.0f,0.75f,0.5f,0.25f});
+        workingRateLabel = new JLabel("Ставка: ",JLabel.RIGHT);
+        postList = new JComboBox(Employee.POSTS);
+        postLabel = new JLabel("Должность: ",JLabel.RIGHT);
+        bithPiker = new DatePicker();
+        bithDayLabel = new JLabel("Дата рожденье: ",JLabel.RIGHT);
+        patronomicTextField = new JTextField();
+        patronomicLabel = new JLabel("Отчество: ",JLabel.RIGHT);
+        nameTextField = new JTextField();
+        nameLabel = new JLabel("Имя: ",JLabel.RIGHT);
+        surnameTextField = new JTextField();
+        surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
         
-        this.setSize(w, h);
-        this.setLocationRelativeTo(null);
-        this.setResizable(false);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setLayout(null);
-        this.setBackground(Color.GRAY);
         
-   ///////////////////////////////////Фамилия //////////////////////////////////
+        mainFraim.setEnabled(true);
+
+                ///////////////////////////////////WInDOW mainFraim///////////////////////////////////
+        
+        mainFraim.setSize(w, h);
+        mainFraim.setLocationRelativeTo(null);
+        mainFraim.setResizable(false);
+        mainFraim.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        mainFraim.setLayout(null);
+        mainFraim.setBackground(Color.GRAY);
+           ///////////////////////////////////Фамилия //////////////////////////////////
         surnameLabel.setFont(F);
         surnameLabel.setBounds(15, 10, 150, 20);
         surnameLabel.setForeground(Color.RED);
@@ -107,28 +113,31 @@ public class WindowEmployeeCreator extends JFrame {
         departmentLabel.setForeground(Color.RED);   
         departmentList.setLayout(null);
         departmentList.setBounds(160, 130,160, 20);   
-        
-        
-        //////////////////Кнопка////////////////////
-     
-        button.addActionListener(e->{
+         ///////////////////////Номер Кабинета ///////////////////////////////////
+        cabinetNumberLabel.setFont(F);
+        cabinetNumberLabel.setBounds(15, 150, 150, 20);
+        cabinetNumberLabel.setForeground(Color.RED);   
+        cabinetNumberList.setLayout(null);
+        cabinetNumberList.setBounds(160, 150,160, 20); 
+         //////////////////Кнопка создать////////////////////
+        buttonCreate.setBounds(110, 260, 120, 25);
+        buttonCreate.addActionListener(e->{
                                         employee.setSurname(this.surnameTextField.getText());
                                         employee.setName(nameTextField.getText());
                                         employee.setPatronomic(patronomicTextField.getText());
                                         employee.setBithDay(bithPiker.getDate());
-                                        employee.setPost((String)postList.getSelectedItem());
+                                        employee.setPost((byte)postList.getSelectedIndex());
                                         employee.setWorkingRate((Float)workingRateList.getSelectedItem());
-                                        employee.setDepartment((String)departmentList.getSelectedItem());
+                                        employee.setCabinetNumber((Byte)cabinetNumberList.getSelectedItem());
+                                        employee.setDepartment((byte)departmentList.getSelectedIndex());
                                         employee.setEndEmployment(Calendar.getInstance());
                                         //System.out.println("Сотрудник создан в окне WindowEmployee!");
                                         //System.out.println(employee.toString());
-                                        this.setEnabled(false);
-                                        this.setVisible(false);
+                                        
+                                        mainFraim.dispose();
+                                        
                                          });
-        button.setBounds(110, 260, 120, 25);
-     
-        
-    ///////////////////////Добавляем все элементы/////////////////////////    
+ 
         mainPanel.setLayout(null);
         mainPanel.setBounds(2, 2, 331, 298);
         mainPanel.add(surnameLabel);
@@ -145,14 +154,22 @@ public class WindowEmployeeCreator extends JFrame {
         mainPanel.add(workingRateList);
         mainPanel.add(departmentLabel);
         mainPanel.add(departmentList);
-        mainPanel.add(button);
+        mainPanel.add(cabinetNumberLabel);
+        mainPanel.add(cabinetNumberList);
+        
+    };
+    public Employee createNewEmployee() throws InterruptedException 
+    { 
+        employee = new Employee();
+  
+    ///////////////////////Добавляем все элементы/////////////////////////    
+
+        mainPanel.add(buttonCreate);
         mainPanel.setBorder(BorderFactory.createEtchedBorder());
-        this.add(mainPanel);
-        this.setVisible(true);
-    }
-    public Employee getEmployee()
-    {
+        mainFraim.add(mainPanel);
+        mainFraim.setVisible(true);
+     
         return employee;
     }
-
+ 
 }

@@ -116,7 +116,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
             tip.add(buttonOk);
             this.add(tip);
             
-            table.setModel(new TableModel(date)); ///добавид установку модели в конце, так как при первой загрузке таблицы разрер не соответствовал панели
+            table.setModel(new CalendarTableModel(date)); ///добавид установку модели в конце, так как при первой загрузке таблицы разрер не соответствовал панели
             
             System.out.println("\nCLICK");
 
@@ -164,7 +164,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
                                                                              listMonth.getSelectedIndex(),
                                                                              1);
                                                 date.setFirstDayOfWeek(Calendar.MONDAY);
-                                                table.setModel(new TableModel(date));
+                                                table.setModel(new CalendarTableModel(date));
                                                 yearField.setText(Integer.toString(YEARS[listYear.getSelectedIndex()]));
                                                 buttonOk.setEnabled(false);
                                                });
@@ -174,7 +174,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
                                                                              listMonth.getSelectedIndex(),
                                                                              1);
                                                 date.setFirstDayOfWeek(Calendar.MONDAY);
-                                                table.setModel(new TableModel(date));
+                                                table.setModel(new CalendarTableModel(date));
                                                 if(listMonth.getSelectedIndex()<9){monthField.setText('0'+Integer.toString(listMonth.getSelectedIndex()+1));}
                                                 else{monthField.setText(Integer.toString(listMonth.getSelectedIndex()+1));}
                                                 buttonOk.setEnabled(false);

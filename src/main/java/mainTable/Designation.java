@@ -4,6 +4,9 @@
  */
 package mainTable;
 
+import java.util.Iterator;
+import javax.swing.table.AbstractTableModel;
+
 
 public class Designation { // объекты обозначения в главной таблице с графиком работы
     private final static String[] acceptable = {"У","В","У/В","Б", "Ух", "У7",};// 
@@ -25,7 +28,7 @@ public class Designation { // объекты обозначения в глав�
     public Designation(String val){ //если введен неприемлемый аргумент выбрасываем исключеение (не соответствует ни одному из элментов массива acctptable)
         if(indexOf(val)==-1)
         {
-            throw new IllegalArgumentException("IllegalArgumentException: Аргумент, передаваемый конструктору Designation() не найден в массиве String[] acceptable = {\"У\",\"В\",\"У/В\",\"Б\", \"Ух\", \"У7\",};");
+            throw new IllegalArgumentException("IllegalArgumentException: Аргумент, передаваемый конструктору Designation("+val+") не найден в массиве String[] acceptable = {\"У\",\"В\",\"У/В\",\"Б\", \"Ух\", \"У7\",};");
         }
         value = val;
         condition = true;

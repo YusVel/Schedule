@@ -5,19 +5,17 @@
 package Date;
 import javax.swing.table.AbstractTableModel;
 import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Set;
+
 /**
  *
  * @author yusup
  */
-public class TableModel extends  AbstractTableModel{
+public class CalendarTableModel extends  AbstractTableModel{
     final String[] DAYS_OF_WEEK = { 
             "Пн","Вт", "Ср","Чт","Пт","Сб", "Вс"
         };  
     Integer[][] tableDays;
-    TableModel(Calendar calendar)
+    CalendarTableModel(Calendar calendar)
     {
          super();
          System.out.printf("%d-%d-%d", calendar.get(Calendar.DAY_OF_MONTH),calendar.get(Calendar.MONTH),calendar.get(Calendar.YEAR));

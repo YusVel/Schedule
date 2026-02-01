@@ -15,16 +15,11 @@ import static java.lang.System.out;
 public class Schedule {
 
     public static void main(String[] args) throws InterruptedException  {
-    try
-    {
-        Designation a = new Designation("У/В");
-    }
-    catch(IllegalArgumentException e)
-    {
-       out.println(e.getLocalizedMessage());
-    }
-    
 
+    
+      
+        
+        
     /*
         JFrame window = new JFrame("sdsdfsdfsd");
         window.setLayout(null);

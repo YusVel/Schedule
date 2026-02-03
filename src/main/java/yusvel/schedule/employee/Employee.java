@@ -56,6 +56,7 @@ public class Employee implements Comparable<Employee>// Класс работн�
        post = 0;
        department = 0;
        beginEmployment = Calendar.getInstance();
+       cabinetNumber = 1;
     }
     @Override
     public int compareTo(Employee other) {
@@ -135,7 +136,7 @@ public class Employee implements Comparable<Employee>// Класс работн�
     @Override public String toString()
     {
         String result;
-        result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+post+" "+department+'\n'+"Кабинет: "+cabinetNumber;
+        result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+POSTS[post]+" "+DEPARTMENTS[department]+'\n'+"Кабинет: "+cabinetNumber;
         return result;
     }
     

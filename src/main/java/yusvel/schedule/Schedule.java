@@ -9,16 +9,24 @@ import yusvel.schedule.employee.WindowEmployeeCreator;
 import mainTable.*;
 
 import static java.lang.System.out;
-
+import java.util.*;
 
 
 public class Schedule {
 
     public static void main(String[] args) throws InterruptedException  {
-
-    
-      
-        
+     
+        int countE = 3;
+        WindowEmployeeCreator w = new WindowEmployeeCreator();
+        ArrayList<Employee> listOfEmployees = new ArrayList<>(countE);
+        for(int i = 0;i<countE;i++)
+        {
+            listOfEmployees.add(w.createNewEmployee());
+        }
+        for(Employee e:listOfEmployees)
+        {
+            out.println(e);
+        }
         
     /*
         JFrame window = new JFrame("sdsdfsdfsd");

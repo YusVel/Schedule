@@ -9,7 +9,7 @@ import java.util.Calendar;
 
 public class WindowEmployeeCreator  {
     Employee employee;
-    JFrame mainFraim;
+    JDialog mainFraim;
     JLabel surnameLabel;  
     JTextField surnameTextField;
     JLabel nameLabel;
@@ -36,9 +36,9 @@ public class WindowEmployeeCreator  {
      public  WindowEmployeeCreator()
     {
         System.out.println("Constructor WindowEmployeeCreator");
-        mainFraim = new JFrame();
+        mainFraim = new JDialog();
         mainPanel = new JPanel();
-        buttonCreate = new JButton("Создать");
+        buttonCreate = new JButton();
         cabinetNumberLabel = new JLabel("№ Кабинета: ",JLabel.RIGHT);
         cabinetNumberList = new JComboBox(new Byte[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
         departmentList = new JComboBox(Employee.DEPARTMENTS);
@@ -48,7 +48,7 @@ public class WindowEmployeeCreator  {
         postList = new JComboBox(Employee.POSTS);
         postLabel = new JLabel("Должность: ",JLabel.RIGHT);
         bithPiker = new DatePicker();
-        bithDayLabel = new JLabel("Дата рожденье: ",JLabel.RIGHT);
+        bithDayLabel = new JLabel("Дата рождения: ",JLabel.RIGHT);
         patronomicTextField = new JTextField();
         patronomicLabel = new JLabel("Отчество: ",JLabel.RIGHT);
         nameTextField = new JTextField();
@@ -57,7 +57,7 @@ public class WindowEmployeeCreator  {
         surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
         
         
-        mainFraim.setEnabled(true);
+        mainFraim.setModal(true);
 
                 ///////////////////////////////////WInDOW mainFraim///////////////////////////////////
         
@@ -163,12 +163,12 @@ public class WindowEmployeeCreator  {
         employee = new Employee();
   
     ///////////////////////Добавляем все элементы/////////////////////////    
-
+        buttonCreate.setText("Создать");
+        mainFraim.setTitle("Введите данные нового сотрудника");
         mainPanel.add(buttonCreate);
         mainPanel.setBorder(BorderFactory.createEtchedBorder());
         mainFraim.add(mainPanel);
         mainFraim.setVisible(true);
-     
         return employee;
     }
  

@@ -17,17 +17,17 @@ public class Schedule {
     public static void main(String[] args) throws InterruptedException  {
      
         int countE = 3;
-        WindowEmployeeCreator w = new WindowEmployeeCreator();
+        
         ArrayList<Employee> listOfEmployees = new ArrayList<>(countE);
         for(int i = 0;i<countE;i++)
         {
-            listOfEmployees.add(w.createNewEmployee());
+            listOfEmployees.add(Employee.create());
         }
         for(Employee e:listOfEmployees)
         {
             out.println(e);
         }
-        
+        listOfEmployees.sort((a,b)->{return a.compareTo(b);});
     /*
         JFrame window = new JFrame("sdsdfsdfsd");
         window.setLayout(null);

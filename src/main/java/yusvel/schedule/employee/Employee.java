@@ -2,13 +2,59 @@
 package yusvel.schedule.employee;
 import javax.swing.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Objects;
 import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
-public class Employee implements Comparable<Employee>// Класс работник
+class Human
 {
- 
+    String surname;
+    String name;
+    String patronomic;
+    Calendar bithDay;
+    Human(String surname,String name,String patronomic,Calendar bithDay)
+    {
+        this.surname = surname;
+        this.name = name;
+        this.patronomic = patronomic;
+        this.bithDay = bithDay;
+    }
+    @Override public String toString()
+    {
+        return surname + ' '+name+' '+patronomic+ " ("+ bithDay.get(Calendar.DAY_OF_MONTH)+"."+ bithDay.get(Calendar.MONTH)+"."+ bithDay.get(Calendar.YEAR)+")\n";
+    }
+    @Override public boolean equals(Object obj)
+    {
+        if(obj==null){return false;}
+        if(!obj.getClass().equals(this.getClass())){return false;}
+        Employee another = (Employee)obj;
+        return this.surname.equals(another.surname)
+                &&this.name.equals(another.name)
+                &&this.patronomic.equals(another.patronomic)
+                &&this.bithDay.equals(another.bithDay);
+         
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 67 * hash + Objects.hashCode(this.surname);
+        hash = 67 * hash + Objects.hashCode(this.name);
+        hash = 67 * hash + Objects.hashCode(this.patronomic);
+        hash = 67 * hash + Objects.hashCode(this.bithDay);
+        return hash;
+    }
+}
+
+
+
+
+
+public class Employee extends Human implements Comparable<Employee>// Класс работник
+{
+    
  public static final String[] POSTS = new String[]
 {
     "Хирург-стоматолог",
@@ -33,10 +79,10 @@ public class Employee implements Comparable<Employee>// Класс работн�
     "Вспомог. персонал"
 };
 
-    private String surname;
-    private String name;
-    private String patronomic;
-    private Calendar bithDay;
+static public Employee create()
+{
+    return new WindowEmployeeCreator().createNewEmployee();   
+}
     private Float workingRate;
     private Byte post;
     private Byte department;
@@ -46,17 +92,15 @@ public class Employee implements Comparable<Employee>// Класс работн�
     
     private boolean isEmployed;
       
-   public Employee()
+     Employee()
     {
-       surname = "Surname";
-       name = "Name";
-       patronomic = "Patronomic";
-       bithDay = Calendar.getInstance();
+       super("Surname","Name","Patronomic",Calendar.getInstance());
        workingRate = 1.0f;
        post = 0;
        department = 0;
        beginEmployment = Calendar.getInstance();
        cabinetNumber = 1;
+       isEmployed = false;
     }
     @Override
     public int compareTo(Employee other) {
@@ -66,22 +110,7 @@ public class Employee implements Comparable<Employee>// Класс работн�
         }
         return other.post-this.post;
     }
-    
-    
-    public Employee(Employee one)
-    {
-        System.out.println("Constructor COPY");
-        
-        this.surname = one.surname;
-        this.name = one.name;
-        this.patronomic = one.patronomic;
-        this.bithDay = one.bithDay;
-        this.workingRate = one.workingRate;
-        this.post = one.post;
-        this.department=one.department;
-        this.beginEmployment = one.beginEmployment;
-        this.endEmployment = endEmployment;  
-    }
+
     //////////////Создание окна для заполнения полей///////////////////
 
     //СЕТТЕРЫ
@@ -124,8 +153,7 @@ public class Employee implements Comparable<Employee>// Класс работн�
     {
         this.cabinetNumber = cabinetNumber;
     }
- 
-    ///ГЕТТЕР
+    ///
     /// @return 
     public String getFullName()
     {
@@ -133,13 +161,39 @@ public class Employee implements Comparable<Employee>// Класс работн�
     }
     public String getPost(){return POSTS[post];}
     
+    ArrayList<Employee> readFromFile(String path)
+    {
+        return null;
+    }
+    
     @Override public String toString()
     {
         String result;
         result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+POSTS[post]+" "+DEPARTMENTS[department]+'\n'+"Кабинет: "+cabinetNumber;
         return result;
     }
-    
+    @Override public boolean equals(Object obj)
+    {
+        if(obj==null){return false;}
+        if(!obj.getClass().equals(this.getClass())){return false;}
+        Employee another = (Employee)obj;
+        return   ((Human)this).equals((Human)another)
+                 &&this.workingRate.equals(another.workingRate)
+                 &&this.post.equals(another.post)
+                 &&this.department.equals(another.department);
+         
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = super.hashCode();
+        hash = 97 * hash + Objects.hashCode(this.workingRate);
+        hash = 97 * hash + Objects.hashCode(this.post);
+        hash = 97 * hash + Objects.hashCode(this.department);
+        hash = 97 * hash + Objects.hashCode(this.beginEmployment);
+        hash = 97 * hash + Objects.hashCode(this.endEmployment);
+        return hash;
+    }
 }
 
 

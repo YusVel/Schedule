@@ -33,7 +33,7 @@ public class WindowEmployeeCreator  {
     int w =350;
     int h = 340;
     
-     public  WindowEmployeeCreator()
+    WindowEmployeeCreator()
     {
         System.out.println("Constructor WindowEmployeeCreator");
         mainFraim = new JDialog();
@@ -130,7 +130,8 @@ public class WindowEmployeeCreator  {
                                         employee.setWorkingRate((Float)workingRateList.getSelectedItem());
                                         employee.setCabinetNumber((Byte)cabinetNumberList.getSelectedItem());
                                         employee.setDepartment((byte)departmentList.getSelectedIndex());
-                                        employee.setEndEmployment(Calendar.getInstance());
+                                        employee.setBeginEmployment(Calendar.getInstance());
+                                       
                                         //System.out.println("Сотрудник создан в окне WindowEmployee!");
                                         //System.out.println(employee.toString());
                                         
@@ -158,7 +159,7 @@ public class WindowEmployeeCreator  {
         mainPanel.add(cabinetNumberList);
         
     };
-    public Employee createNewEmployee() throws InterruptedException 
+    public Employee createNewEmployee() 
     { 
         employee = new Employee();
   
@@ -171,5 +172,8 @@ public class WindowEmployeeCreator  {
         mainFraim.setVisible(true);
         return employee;
     }
- 
+    public  void chandgeEmployee()
+    {
+        
+    }
 }

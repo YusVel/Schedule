@@ -2,6 +2,8 @@
 
 package yusvel.schedule;
 import Date.DatePicker;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
@@ -14,11 +16,12 @@ import java.util.*;
 
 public class Schedule {
 
-    public static void main(String[] args) throws InterruptedException  {
+    public static void main(String[] args) throws  FileNotFoundException, IOException, ClassNotFoundException  {
      
-        int countE = 3;
+        int countE = 1;
         
         ArrayList<Employee> listOfEmployees = new ArrayList<>(countE);
+        
         for(int i = 0;i<countE;i++)
         {
             listOfEmployees.add(Employee.create());
@@ -27,7 +30,16 @@ public class Schedule {
         {
             out.println(e);
         }
-        listOfEmployees.sort((a,b)->{return a.compareTo(b);});
+        out.println("Количество работников до записи в файл: "+ listOfEmployees.size());
+        Employee.writeToFile(listOfEmployees);
+        
+        listOfEmployees = Employee.readFromFile();
+        out.println("Количество работников: "+ listOfEmployees.size());
+        for(Employee e:listOfEmployees)
+        {
+            out.println(e.getFullName());
+        }
+        
     /*
         JFrame window = new JFrame("sdsdfsdfsd");
         window.setLayout(null);

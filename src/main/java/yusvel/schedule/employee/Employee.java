@@ -2,13 +2,23 @@
 package yusvel.schedule.employee;
 import javax.swing.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.RandomAccessFile;
+import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
-class Human
+class Human implements Serializable
 {
     String surname;
     String name;
@@ -52,9 +62,9 @@ class Human
 
 
 
-public class Employee extends Human implements Comparable<Employee>// Класс работник
+public class Employee extends Human implements Comparable<Employee>, Serializable// Класс работник
 {
-    
+ static private String path = Paths.get("").toAbsolutePath().toString()+"/sheluha.emp";//где будем сохранять файл с сотрудниками
  public static final String[] POSTS = new String[]
 {
     "Хирург-стоматолог",
@@ -101,6 +111,17 @@ static public Employee create()
        beginEmployment = Calendar.getInstance();
        cabinetNumber = 1;
        isEmployed = false;
+    }
+    Employee(Employee other)
+    {
+       super(other.surname,other.name,other.patronomic,other.bithDay);
+       workingRate = other.workingRate;
+       post = other.post;
+       department = other.department;
+       beginEmployment = other.beginEmployment;
+       endEmployment = other.endEmployment;
+       cabinetNumber = other.cabinetNumber;
+       isEmployed = other.isEmployed;
     }
     @Override
     public int compareTo(Employee other) {
@@ -153,6 +174,10 @@ static public Employee create()
     {
         this.cabinetNumber = cabinetNumber;
     }
+    public static void setShortFileNameToIO(String name)
+    {
+        path = name;
+    }
     ///
     /// @return 
     public String getFullName()
@@ -160,10 +185,59 @@ static public Employee create()
         return String.format("%s %s %s ", surname,name,patronomic);
     }
     public String getPost(){return POSTS[post];}
-    
-    ArrayList<Employee> readFromFile(String path)
+    /////////////////////////Запись и чтение/////////////////////////////////////
+  
+    /// @throws java.io.FileNotFoundException
+    /// @throws java.lang.ClassNotFoundException
+    public static ArrayList<Employee> readFromFile() throws FileNotFoundException, IOException, ClassNotFoundException
     {
-        return null;
+        ArrayList<Employee> result = new ArrayList<>();
+        try
+        {
+            File file = new File(path);
+            if(!file.exists()){throw new FileNotFoundException("Файл для чтения отсутствует");}
+            try(FileInputStream fin = new FileInputStream(file); ObjectInputStream oifin = new ObjectInputStream(fin))
+                {
+                    System.out.println("Чтение из файла "+oifin.available()+" байт");
+                    result = (ArrayList<Employee>)oifin.readObject();  
+                }
+        }
+        catch(FileNotFoundException e)
+        {
+            System.out.println(e.getMessage()+"исключение при чтении FileNotFoundException");
+        }
+        catch(IOException e)
+        {
+            System.out.println(e.getMessage()+ "исключение при чтении IOException");
+        }
+        
+        return result;
+    }
+    
+    
+    public static void writeToFile(ArrayList<Employee> arr) throws FileNotFoundException, IOException
+    {
+
+         File file = new File(path);
+         file.setReadable(true);
+         file.setWritable(true);
+         if(!file.exists()) //создаем файл для записи данных, если он не существует
+         {
+             file.createNewFile();
+             System.out.println("CREATED new file: "+file.getPath());
+         }
+        try( ObjectOutputStream oOut = new ObjectOutputStream(new FileOutputStream(file)))
+        {
+            oOut.writeObject(arr);
+        }
+        catch(FileNotFoundException e)
+        {
+            System.out.println(e.getMessage()+"исключение при записи FileNotFoundException");
+        }
+        catch(IOException e)
+        {
+            System.out.println(e.getMessage()+ "исключение при записи IOException");
+        }
     }
     
     @Override public String toString()

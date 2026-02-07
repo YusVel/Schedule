@@ -10,12 +10,9 @@ import javax.swing.table.JTableHeader;
 
 public class DatePicker extends JPanel implements ActionListener,MouseListener {
     private Calendar date;
-    private int year = 0;
-    private int month = 0;
-    private int dayOfMonth = 0;
-    JTextField yearField;
-    JTextField monthField;
-    JTextField dayOfMonthField;
+    public JTextField yearField;
+    public JTextField monthField;
+    public JTextField dayOfMonthField;
     JButton button;
     JPanel  tip = new JPanel();
    public DatePicker()
@@ -45,11 +42,43 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
         add(button);
         setVisible(true);
     }
-
+    public DatePicker(Calendar anotheDate)
+    {
+        super();
+        date = anotheDate;
+        
+        yearField = new JTextField(Integer.toString(date.get(Calendar.YEAR)));
+        yearField.setBounds(43, 1, 40, 20);
+        yearField.setEditable(false);
+        monthField = new JTextField(Integer.toString(date.get(Calendar.MONTH)+1));
+        monthField.setBounds(22, 1, 20, 20);
+        monthField.setEditable(false);
+        dayOfMonthField = new JTextField(Integer.toString(date.get(Calendar.DAY_OF_MONTH)));  
+        dayOfMonthField.setBounds(2, 1, 20, 20);
+        dayOfMonthField.setEditable(false);
+        button = new JButton("дата");
+        button.setBounds(84, 1, 78, 19);
+        button.addMouseListener(this);
+        
+        
+        setLayout(null);
+        this.setSize(170, 20);
+        add(yearField);
+        add(monthField);
+        add(dayOfMonthField);
+        add(button);
+        setVisible(true);
+    }
     public Calendar getDate() {
         return date;
     }
-
+    public void setDate(Calendar anotheDate)
+    {
+        yearField.setText(Integer.toString(anotheDate.get(Calendar.YEAR)));
+        monthField.setText(Integer.toString(anotheDate.get(Calendar.MONTH)+1));
+        dayOfMonthField.setText(Integer.toString(anotheDate.get(Calendar.DAY_OF_MONTH)));
+        date = anotheDate;
+    }
     @Override
     public void actionPerformed(ActionEvent e) {
         
@@ -122,11 +151,10 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
 
             ////////////////////////Обработка ивентов/////////////////////////////////
              buttonOk.addActionListener(event->{ ////////////////////////Клик на ОК//////////////////////////////
-                                                System.out.printf("Date %d-%s-%d Picked",date.get(Calendar.DAY_OF_MONTH),MONTHS_OF_YEAR[date.get(Calendar.MONTH)],date.get(Calendar.YEAR));
+                                                //System.out.printf("Date %d-%s-%d Picked",date.get(Calendar.DAY_OF_MONTH),MONTHS_OF_YEAR[date.get(Calendar.MONTH)],date.get(Calendar.YEAR));
                                                 this.setSize(180, 20);
-                                               
-                                              });
-           table.addMouseListener(new MouseListener(){ ////////////////////Активация кнопки ок при клеке на число///////////////////
+                                               });
+            table.addMouseListener(new MouseListener(){ ////////////////////Активация кнопки ок при клеке на число///////////////////
                                                     @Override
                                                     public void mouseClicked(MouseEvent e) {
                                                     Integer valueAt = (Integer)table.getModel().getValueAt(table.getSelectedRow(), table.getSelectedColumn());
@@ -135,7 +163,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
                                                             if(date.get(Calendar.DAY_OF_YEAR)<10){dayOfMonthField.setText('0'+Integer.toString(date.get(Calendar.DAY_OF_YEAR)));}
                                                             else{dayOfMonthField.setText(Integer.toString(date.get(Calendar.DAY_OF_YEAR)));}
                                                             buttonOk.setEnabled(false);
-                                                            System.out.println("ButtonOK turnOFF value in table=NULL");
+                                                            //System.out.println("ButtonOK turnOFF value in table=NULL");
                                                         }
                                                      else
                                                         {
@@ -143,7 +171,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
                                                             else{dayOfMonthField.setText((valueAt).toString());}
                                                             date.set(Calendar.DAY_OF_MONTH, valueAt);
                                                            buttonOk.setEnabled(true);
-                                                           System.out.println("ButtonOK turnON");
+                                                           //System.out.println("ButtonOK turnON");
                                                         }
                                                     }
 

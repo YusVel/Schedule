@@ -1,6 +1,7 @@
 
 
 package yusvel.schedule;
+import Table.DesignationInTheMainTable;
 import Date.DatePicker;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -8,7 +9,6 @@ import java.util.NoSuchElementException;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
 import yusvel.schedule.employee.WindowEmployeeCreator;
-import mainTable.*;
 
 import static java.lang.System.out;
 import java.util.*;
@@ -18,28 +18,29 @@ public class Schedule {
 
     public static void main(String[] args) throws  FileNotFoundException, IOException, ClassNotFoundException  {
      
-        int countE = 1;
-        
-        ArrayList<Employee> listOfEmployees = new ArrayList<>(countE);
-        
+        int countE = 3;
+      
+        ArrayList<Employee> arr = new ArrayList<>();
+        /*
         for(int i = 0;i<countE;i++)
         {
-            listOfEmployees.add(Employee.create());
+            if(arr.add(Employee.create())){out.println(arr.getLast());}
+            else{out.println("Данный сотрудник быд РАНЕЕ ДОБАВЛЕН");}
         }
-        for(Employee e:listOfEmployees)
-        {
-            out.println(e);
-        }
-        out.println("Количество работников до записи в файл: "+ listOfEmployees.size());
-        Employee.writeToFile(listOfEmployees);
+        out.println("Колическтво сотрудников перед записью: "+arr.size());
+        Employee.writeToFile(arr);
+        for(Employee e:arr){out.println(e);}
+        */
+        arr = Employee.readFromFile();
+        out.println("Колическтво сотрудников: "+arr.size());
+        for(Employee e:arr){out.println(e);}
+        var iter = arr.iterator();iter = arr.iterator();
         
-        listOfEmployees = Employee.readFromFile();
-        out.println("Количество работников: "+ listOfEmployees.size());
-        for(Employee e:listOfEmployees)
+        for(int i = 0;i<arr.size();i++)
         {
-            out.println(e.getFullName());
+          arr.get(i).chandge();
         }
-        
+        Employee.writeToFile(arr);
     /*
         JFrame window = new JFrame("sdsdfsdfsd");
         window.setLayout(null);

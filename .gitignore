@@ -2,4 +2,3 @@
 *.lst
 /target/
 pom.xml
-*.emp

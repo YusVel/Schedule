@@ -9,21 +9,22 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.RandomAccessFile;
 import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
 class Human implements Serializable
 {
-    String surname;
-    String name;
-    String patronomic;
-    Calendar bithDay;
+    protected String surname;
+    protected String name;
+    protected String patronomic;
+    protected Calendar bithDay;
     Human(String surname,String name,String patronomic,Calendar bithDay)
     {
         this.surname = surname;
@@ -56,6 +57,9 @@ class Human implements Serializable
         hash = 67 * hash + Objects.hashCode(this.bithDay);
         return hash;
     }
+    public String getName(){return name;}
+    public String getSurname(){return surname;}
+    public String getPatronomic(){return patronomic;}
 }
 
 
@@ -64,7 +68,7 @@ class Human implements Serializable
 
 public class Employee extends Human implements Comparable<Employee>, Serializable// Класс работник
 {
- static private String path = Paths.get("").toAbsolutePath().toString()+"/sheluha.emp";//где будем сохранять файл с сотрудниками
+ static private String fileName = "treeEmployees.emp";// короткое имя файла с сотрудниками 
  public static final String[] POSTS = new String[]
 {
     "Хирург-стоматолог",
@@ -92,6 +96,11 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
 static public Employee create()
 {
     return new WindowEmployeeCreator().createNewEmployee();   
+}
+
+public void chandge()
+{
+  new WindowEmployeeCreator().changedEmployee(this);
 }
     private Float workingRate;
     private Byte post;
@@ -125,11 +134,22 @@ static public Employee create()
     }
     @Override
     public int compareTo(Employee other) {
-        if(this.post.equals(other.post))
+        if(this.post.equals(other.post))//если должности одинаковые
         {
-            return other.cabinetNumber-this.cabinetNumber;
+            if(this.department.equals(other.department))//если отделения одинаковые
+            {
+                if(this.cabinetNumber.equals(other.cabinetNumber))
+                {
+                    return this.surname.compareTo(other.surname);
+                }
+                return this.cabinetNumber - other.cabinetNumber;
+            }
+            return this.department-other.department;
         }
-        return other.post-this.post;
+        else
+        {
+            return this.post-other.post;
+        }
     }
 
     //////////////Создание окна для заполнения полей///////////////////
@@ -176,7 +196,7 @@ static public Employee create()
     }
     public static void setShortFileNameToIO(String name)
     {
-        path = name;
+        fileName = name;
     }
     ///
     /// @return 
@@ -184,7 +204,11 @@ static public Employee create()
     {
         return String.format("%s %s %s ", surname,name,patronomic);
     }
-    public String getPost(){return POSTS[post];}
+    public Byte getPost(){return post;}
+    public Float getWorkingRate(){return workingRate;}
+    public Byte getDepartment(){return department;}
+    public Byte getCabineNumber(){return cabinetNumber;}
+    public Calendar getBeginEmployment(){return beginEmployment;}
     /////////////////////////Запись и чтение/////////////////////////////////////
   
     /// @throws java.io.FileNotFoundException
@@ -194,11 +218,10 @@ static public Employee create()
         ArrayList<Employee> result = new ArrayList<>();
         try
         {
-            File file = new File(path);
+            File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
             if(!file.exists()){throw new FileNotFoundException("Файл для чтения отсутствует");}
             try(FileInputStream fin = new FileInputStream(file); ObjectInputStream oifin = new ObjectInputStream(fin))
                 {
-                    System.out.println("Чтение из файла "+oifin.available()+" байт");
                     result = (ArrayList<Employee>)oifin.readObject();  
                 }
         }
@@ -215,10 +238,10 @@ static public Employee create()
     }
     
     
-    public static void writeToFile(ArrayList<Employee> arr) throws FileNotFoundException, IOException
+    public static void writeToFile(ArrayList<Employee> tree) throws FileNotFoundException, IOException
     {
 
-         File file = new File(path);
+         File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
          file.setReadable(true);
          file.setWritable(true);
          if(!file.exists()) //создаем файл для записи данных, если он не существует
@@ -228,7 +251,7 @@ static public Employee create()
          }
         try( ObjectOutputStream oOut = new ObjectOutputStream(new FileOutputStream(file)))
         {
-            oOut.writeObject(arr);
+            oOut.writeObject(tree);
         }
         catch(FileNotFoundException e)
         {
@@ -243,7 +266,7 @@ static public Employee create()
     @Override public String toString()
     {
         String result;
-        result = surname + ' '+name+' '+patronomic+'\n'+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+" "+ bithDay.get(Calendar.YEAR)+'\n'+POSTS[post]+" "+DEPARTMENTS[department]+'\n'+"Кабинет: "+cabinetNumber;
+        result = surname + ' '+name+' '+patronomic+" ("+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+1+" "+ bithDay.get(Calendar.YEAR)+") "+POSTS[post]+" "+DEPARTMENTS[department]+" "+"Кабинет: "+cabinetNumber;
         return result;
     }
     @Override public boolean equals(Object obj)
@@ -251,10 +274,13 @@ static public Employee create()
         if(obj==null){return false;}
         if(!obj.getClass().equals(this.getClass())){return false;}
         Employee another = (Employee)obj;
-        return   ((Human)this).equals((Human)another)
-                 &&this.workingRate.equals(another.workingRate)
-                 &&this.post.equals(another.post)
-                 &&this.department.equals(another.department);
+        return   this.surname.equals(another.surname)
+                &&this.name.equals(another.name)
+                &&this.patronomic.equals(another.patronomic)
+                &&this.bithDay.equals(another.bithDay)
+                &&this.workingRate.equals(another.workingRate)
+                &&this.post.equals(another.post)
+                &&this.department.equals(another.department);
          
     }
 

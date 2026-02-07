@@ -159,6 +159,26 @@ public class WindowEmployeeCreator  {
         mainPanel.add(cabinetNumberList);
         
     };
+    public void changedEmployee(Employee employeeNeedToChanged)
+    {
+        employee = employeeNeedToChanged;
+        surnameTextField.setText(employeeNeedToChanged.surname);
+        nameTextField.setText(employeeNeedToChanged.name);
+        patronomicTextField.setText(employeeNeedToChanged.patronomic);
+        bithPiker.setDate(employeeNeedToChanged.bithDay);
+        postList.setSelectedIndex(employeeNeedToChanged.getPost());
+        workingRateList.setSelectedItem(employeeNeedToChanged.getWorkingRate());
+        cabinetNumberList.setSelectedIndex(employeeNeedToChanged.getCabineNumber()-1);
+        departmentList.setSelectedIndex(employeeNeedToChanged.getDepartment());
+        
+        buttonCreate.setText("Изменить");
+        mainFraim.setTitle("Изменените данные сотрудника");
+        mainPanel.add(buttonCreate);
+        mainPanel.setBorder(BorderFactory.createEtchedBorder());
+        mainFraim.add(mainPanel);
+        mainFraim.setVisible(true);
+    }
+    
     public Employee createNewEmployee() 
     { 
         employee = new Employee();
@@ -172,8 +192,5 @@ public class WindowEmployeeCreator  {
         mainFraim.setVisible(true);
         return employee;
     }
-    public  void chandgeEmployee()
-    {
-        
-    }
+
 }

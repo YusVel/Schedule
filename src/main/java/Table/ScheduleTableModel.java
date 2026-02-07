@@ -1,14 +1,17 @@
 
-package mainTable;
+package Table;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import javax.swing.table.AbstractTableModel;
+import yusvel.schedule.employee.Employee;
 
 /**
  *
  * @author yusup
  */
-public class ScheduleTable extends AbstractTableModel{
-
+public class ScheduleTableModel extends AbstractTableModel implements Serializable{
+    
     @Override
     public int getRowCount() {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody

@@ -15,6 +15,9 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
     public JTextField dayOfMonthField;
     JButton button;
     JPanel  tip = new JPanel();
+    public static final String[] MONTHS_OF_YEAR = new String[]{ 
+             "Январь","Февраль", "Март","Апрель","Май","Июнь", "Июль","Август", "Сентябрь","Октябрь","Ноябрь","Декабрь"
+            };
    public DatePicker()
     {
         super();
@@ -79,6 +82,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
         dayOfMonthField.setText(Integer.toString(anotheDate.get(Calendar.DAY_OF_MONTH)));
         date = anotheDate;
     }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         
@@ -94,9 +98,7 @@ public class DatePicker extends JPanel implements ActionListener,MouseListener {
 
            
             ///////////////////////Выпадающий список месяцев//////////////////////
-            final String[] MONTHS_OF_YEAR = new String[]{ 
-                "Январь","Февраль", "Март","Апрель","Май","Июнь", "Июль","Август", "Сентябрь","Октябрь","Ноябрь","Декабрь"
-            };
+
             JComboBox<String> listMonth = new JComboBox(MONTHS_OF_YEAR);
             listMonth.setBounds(5, 5, 80, 20);
             listMonth.setSelectedIndex(date.get(Calendar.MONTH));

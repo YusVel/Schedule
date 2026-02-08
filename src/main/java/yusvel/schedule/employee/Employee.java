@@ -1,5 +1,6 @@
 
 package yusvel.schedule.employee;
+import Table.Designations;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.File;
@@ -14,8 +15,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import yusvel.schedule.employee.WindowEmployeeCreator;
 
 
@@ -68,48 +67,14 @@ class Human implements Serializable
 
 public class Employee extends Human implements Comparable<Employee>, Serializable// Класс работник
 {
- static private String fileName = "treeEmployees.emp";// короткое имя файла с сотрудниками 
- public static final String[] POSTS = new String[]
-{
-    "Хирург-стоматолог",
-    "Пародонтолог",
-    "Терапевт-стоматолог",
-    "Ортодонт",
-    "Детский стоматолог",
-    "Мед.сестра",
-    "Старшая мед.сестра",
-    "Шлавная мед.сестра",
-    "Заведующий отделением",
-    "Рентген-лаборант",
-    "Начальник медицинской службы",
-    "Главный врач"
-};
-  public static final String[] DEPARTMENTS = new String[]
-{
-    "ОПО",
-    "Лечебное отделение №1",
-    "Лечебное отделение №2",
-    "Детский отделение",
-    "Вспомог. персонал"
-};
-
-static public Employee create()
-{
-    return new WindowEmployeeCreator().createNewEmployee();   
-}
-
-public void chandge()
-{
-  new WindowEmployeeCreator().changedEmployee(this);
-}
     private Float workingRate;
     private Byte post;
     private Byte department;
     private Calendar beginEmployment;
     private Calendar endEmployment;
     private Byte cabinetNumber;
-    
-    private boolean isEmployed;
+    private ArrayList<Designations> workSchedule; //рабочий график каждого сотрудника
+    private boolean workingShift; // кто рабочая смена 1 - нечетные числа - утро(8:00-14:00), 0 нечетные числа - вечер(15:00-21:00)
       
      Employee()
     {
@@ -119,7 +84,7 @@ public void chandge()
        department = 0;
        beginEmployment = Calendar.getInstance();
        cabinetNumber = 1;
-       isEmployed = false;
+       workingShift = false;
     }
     Employee(Employee other)
     {
@@ -130,7 +95,8 @@ public void chandge()
        beginEmployment = other.beginEmployment;
        endEmployment = other.endEmployment;
        cabinetNumber = other.cabinetNumber;
-       isEmployed = other.isEmployed;
+       workSchedule = other.workSchedule;
+       workingShift = other.workingShift;
     }
     @Override
     public int compareTo(Employee other) {
@@ -151,8 +117,40 @@ public void chandge()
             return this.post-other.post;
         }
     }
+    static private String fileName = "treeEmployees.emp";// короткое имя файла с сотрудниками 
+    public static final String[] POSTS = new String[]
+        {
+            "Хирург-стоматолог",
+            "Пародонтолог",
+            "Терапевт-стоматолог",
+            "Ортодонт",
+            "Детский стоматолог",
+            "Мед.сестра",
+            "Старшая мед.сестра",
+            "Шлавная мед.сестра",
+            "Заведующий отделением",
+            "Рентген-лаборант",
+            "Начальник медицинской службы",
+            "Главный врач"
+        };
+     public static final String[] DEPARTMENTS = new String[] // *****!!!!!не стоит менять порядок строк в массиве))*****!!!!!
+        {
+            "ОПО",
+            "Лечебное отделение №1",
+            "Лечебное отделение №2",
+            "Детский отделение",
+            "Вспомог. персонал"
+        };
+    ////////////////////////Создание  и изменение сотрудника через модальное окно JDialog/////////
+    static public Employee create()
+    {
+        return new WindowEmployeeCreator().createNewEmployee();   
+    }
 
-    //////////////Создание окна для заполнения полей///////////////////
+    public void chandgePassport()
+    {
+      new WindowEmployeeCreator().changedEmployee(this);
+    }
 
     //СЕТТЕРЫ
    public void setSurname(String surname){
@@ -179,16 +177,16 @@ public void chandge()
     public void setDepartment(Byte department)
     {
         this.department = department;
+        if(department==1){workingShift=true;} //если отделение 1 то это всегда утренняя смена
+        if(department==2){workingShift=false;}//если отделение 2 то это всегда  вечерняя смена
     }
     public void setBeginEmployment(Calendar beginEmployment)
     {
         this.beginEmployment = beginEmployment;
-        isEmployed=true;
     }
     public void setEndEmployment(Calendar endEmployment)
     {
         this.endEmployment = endEmployment;
-        isEmployed=false;
     }
     public void setCabinetNumber(Byte cabinetNumber)
     {
@@ -197,6 +195,14 @@ public void chandge()
     public static void setShortFileNameToIO(String name)
     {
         fileName = name;
+    }
+    public void setWorkSchedule(ArrayList<Designations> workSchedule)
+    {
+        this.workSchedule = workSchedule; 
+    }
+    public void setWorkingShift(Boolean workingShift)
+    {
+        this.workingShift = workingShift;
     }
     ///
     /// @return 
@@ -209,6 +215,8 @@ public void chandge()
     public Byte getDepartment(){return department;}
     public Byte getCabineNumber(){return cabinetNumber;}
     public Calendar getBeginEmployment(){return beginEmployment;}
+    public ArrayList<Designations> getWorkSchedule(){return workSchedule;}
+    public Boolean getWorkingShift(){return workingShift;}
     /////////////////////////Запись и чтение/////////////////////////////////////
   
     /// @throws java.io.FileNotFoundException
@@ -238,7 +246,7 @@ public void chandge()
     }
     
     
-    public static void writeToFile(ArrayList<Employee> tree) throws FileNotFoundException, IOException
+    public static void writeToFile(ArrayList<Employee> arr) throws FileNotFoundException, IOException
     {
 
          File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
@@ -251,22 +259,25 @@ public void chandge()
          }
         try( ObjectOutputStream oOut = new ObjectOutputStream(new FileOutputStream(file)))
         {
-            oOut.writeObject(tree);
+            oOut.writeObject(arr);
         }
         catch(FileNotFoundException e)
         {
-            System.out.println(e.getMessage()+"исключение при записи FileNotFoundException");
+            System.out.println(e.getMessage()+"исключение при записи ArrayList<Employee> в "+file.getPath());
         }
         catch(IOException e)
         {
-            System.out.println(e.getMessage()+ "исключение при записи IOException");
+            System.out.println(e.getMessage()+ "исключение при записи ArrayList<Employee> в "+file.getPath());
         }
     }
     
     @Override public String toString()
     {
         String result;
-        result = surname + ' '+name+' '+patronomic+" ("+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+1+" "+ bithDay.get(Calendar.YEAR)+") "+POSTS[post]+" "+DEPARTMENTS[department]+" "+"Кабинет: "+cabinetNumber;
+        result = surname + ' '+name+' '+patronomic
+                +" ("+ "Bithday: "+bithDay.get(Calendar.DAY_OF_MONTH)+" "+ bithDay.get(Calendar.MONTH)+1+" "+ bithDay.get(Calendar.YEAR)+") "
+                +POSTS[post]+" "+DEPARTMENTS[department]+", "+"Кабинет: "+cabinetNumber
+                + ", Нечетные числа: "+(workingShift?" УТРО(8:00-14:00)":" ВЕЧЕР(15:00-21:00)");
         return result;
     }
     @Override public boolean equals(Object obj)

@@ -8,8 +8,8 @@ import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 
-public class DesignationInTheMainTable { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
-    private final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд", "У7","ОТ"};// //все возможные состояния обозначения
+public class Designations { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
+    final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд", "У7","ОТ"};// //все возможные состояния обозначения
     public static String getAcceptables(){return String.join(",", ACCEPTABLE);}
     private int value; //обозначение в графике У,В,У/В,Б и тд
     private Boolean condition = true; //Действительно ли выходил на работу
@@ -25,9 +25,9 @@ public class DesignationInTheMainTable { // объекты обозначени�
         }
         return -1;
     }
-    public DesignationInTheMainTable(){value = 0;condition = false;}
-    public DesignationInTheMainTable(int val,Boolean cond){value = val;condition = cond;}
-    public DesignationInTheMainTable(String val){ //если введен неприемлемый аргумент выбрасываем исключеение (не соответствует ни одному из элментов массива acctptable)
+    public Designations(){value = 0;condition = false;}
+    public Designations(int val,Boolean cond){value = val;condition = cond;}
+    public Designations(String val){ //если введен неприемлемый аргумент выбрасываем исключеение (не соответствует ни одному из элментов массива acctptable)
         int index = indexOf(val);
         if(index==-1)
         {

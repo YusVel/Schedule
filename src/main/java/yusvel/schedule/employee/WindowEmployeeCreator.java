@@ -26,10 +26,12 @@ public class WindowEmployeeCreator  {
     JComboBox<String> departmentList;
     JLabel cabinetNumberLabel;  
     JComboBox<Byte> cabinetNumberList;
+    JLabel workingShiftLabel;  
+    JComboBox<Byte> workingShiftList;
     JButton buttonCreate;
     JPanel mainPanel;
     
-    Font F = new Font(Font.MONOSPACED,Font.BOLD,16);
+    Font F = new Font("Caliri",Font.BOLD,14);
     int w =350;
     int h = 340;
     
@@ -39,22 +41,26 @@ public class WindowEmployeeCreator  {
         mainFraim = new JDialog();
         mainPanel = new JPanel();
         buttonCreate = new JButton();
-        cabinetNumberLabel = new JLabel("№ Кабинета: ",JLabel.RIGHT);
+        
+        workingShiftLabel = new JLabel("Смена УТРО/ВЕЧЕР:  ",JLabel.RIGHT);
+        workingShiftList = new JComboBox(new String[]{"ВЕЧЕР(15:00-21:00)","УТРО(8:00-14:00)"});
+        
+        cabinetNumberLabel = new JLabel("№ Кабинета:  ",JLabel.RIGHT);
         cabinetNumberList = new JComboBox(new Byte[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
         departmentList = new JComboBox(Employee.DEPARTMENTS);
-        departmentLabel = new JLabel("Отделение: ",JLabel.RIGHT);
+        departmentLabel = new JLabel("Отделение:  ",JLabel.RIGHT);
         workingRateList = new JComboBox(new Float[]{1.0f,0.75f,0.5f,0.25f});
-        workingRateLabel = new JLabel("Ставка: ",JLabel.RIGHT);
+        workingRateLabel = new JLabel("Ставка:  ",JLabel.RIGHT);
         postList = new JComboBox(Employee.POSTS);
-        postLabel = new JLabel("Должность: ",JLabel.RIGHT);
+        postLabel = new JLabel("Должность:  ",JLabel.RIGHT);
         bithPiker = new DatePicker();
-        bithDayLabel = new JLabel("Дата рождения: ",JLabel.RIGHT);
+        bithDayLabel = new JLabel("Дата рождения:  ",JLabel.RIGHT);
         patronomicTextField = new JTextField();
-        patronomicLabel = new JLabel("Отчество: ",JLabel.RIGHT);
+        patronomicLabel = new JLabel("Отчество:  ",JLabel.RIGHT);
         nameTextField = new JTextField();
-        nameLabel = new JLabel("Имя: ",JLabel.RIGHT);
+        nameLabel = new JLabel("Имя:  ",JLabel.RIGHT);
         surnameTextField = new JTextField();
-        surnameLabel = new JLabel("Фамилия: ",JLabel.RIGHT);
+        surnameLabel = new JLabel("Фамилия:  ",JLabel.RIGHT);
         
         
         mainFraim.setModal(true);
@@ -112,13 +118,33 @@ public class WindowEmployeeCreator  {
         departmentLabel.setBounds(15, 130, 150, 20);
         departmentLabel.setForeground(Color.RED);   
         departmentList.setLayout(null);
-        departmentList.setBounds(160, 130,160, 20);   
+        departmentList.setBounds(160, 130,160, 20); 
+        departmentList.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(departmentList.getSelectedIndex()==1)//меняем вобранный элемент в поле workingShiftList на 1
+                {
+                    workingShiftList.setSelectedIndex(1);
+                }
+                if(departmentList.getSelectedIndex()==2)//меняем вобранный элемент в поле workingShiftList на 0
+                {
+                    workingShiftList.setSelectedIndex(0);
+                }
+            }
+        });
          ///////////////////////Номер Кабинета ///////////////////////////////////
         cabinetNumberLabel.setFont(F);
         cabinetNumberLabel.setBounds(15, 150, 150, 20);
         cabinetNumberLabel.setForeground(Color.RED);   
         cabinetNumberList.setLayout(null);
         cabinetNumberList.setBounds(160, 150,160, 20); 
+         ///////////////////////Рабочаая смена ///////////////////////////////////
+        workingShiftLabel.setFont(F);
+        workingShiftLabel.setBounds(15, 170, 150, 20);
+        workingShiftLabel.setForeground(Color.RED);   
+        workingShiftList.setLayout(null);
+        workingShiftList.setBounds(160, 170,160, 20);        
+        
          //////////////////Кнопка создать////////////////////
         buttonCreate.setBounds(110, 260, 120, 25);
         buttonCreate.addActionListener(e->{
@@ -131,7 +157,7 @@ public class WindowEmployeeCreator  {
                                         employee.setCabinetNumber((Byte)cabinetNumberList.getSelectedItem());
                                         employee.setDepartment((byte)departmentList.getSelectedIndex());
                                         employee.setBeginEmployment(Calendar.getInstance());
-                                       
+                                        employee.setWorkingShift(workingShiftList.getSelectedIndex()!=0);
                                         //System.out.println("Сотрудник создан в окне WindowEmployee!");
                                         //System.out.println(employee.toString());
                                         
@@ -157,7 +183,8 @@ public class WindowEmployeeCreator  {
         mainPanel.add(departmentList);
         mainPanel.add(cabinetNumberLabel);
         mainPanel.add(cabinetNumberList);
-        
+        mainPanel.add(workingShiftLabel);
+        mainPanel.add(workingShiftList);
     };
     public void changedEmployee(Employee employeeNeedToChanged)
     {

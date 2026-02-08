@@ -1,17 +1,20 @@
 
 
 package yusvel.schedule;
-import Table.DesignationInTheMainTable;
-import Date.DatePicker;
+import Table.Designations;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
-import yusvel.schedule.employee.WindowEmployeeCreator;
+
 
 import static java.lang.System.out;
 import java.util.*;
+import org.jdesktop.swingx.JXFrame;
 
 
 public class Schedule {
@@ -21,37 +24,21 @@ public class Schedule {
         int countE = 3;
       
         ArrayList<Employee> arr = new ArrayList<>();
+        out.println(Employee.create());
         /*
-        for(int i = 0;i<countE;i++)
-        {
-            if(arr.add(Employee.create())){out.println(arr.getLast());}
-            else{out.println("Данный сотрудник быд РАНЕЕ ДОБАВЛЕН");}
-        }
-        out.println("Колическтво сотрудников перед записью: "+arr.size());
-        Employee.writeToFile(arr);
-        for(Employee e:arr){out.println(e);}
-        */
-        arr = Employee.readFromFile();
-        out.println("Колическтво сотрудников: "+arr.size());
-        for(Employee e:arr){out.println(e);}
-        var iter = arr.iterator();iter = arr.iterator();
+        JFrame window = new JFrame("LayOut");
+        window.setDefaultCloseOperation(JXFrame.EXIT_ON_CLOSE);
+        window.setLayout(new GridBagLayout());
+      
         
-        for(int i = 0;i<arr.size();i++)
-        {
-          arr.get(i).chandge();
-        }
-        Employee.writeToFile(arr);
-    /*
-        JFrame window = new JFrame("sdsdfsdfsd");
-        window.setLayout(null);
-        window.setBounds(500, 500,500,500);
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        DatePicker piker = new DatePicker();
-       
-        window.add(piker);
-        
+        JTable table = new JTable(); 
+        JScrollPane tableScroll = new JScrollPane(table);
+        tableScroll.setPreferredSize(new Dimension(400,400));
+        window.add(tableScroll,new GridBagConstraints(0,0,1,1,1,1,GridBagConstraints.NORTH,1,new Insets(3,3,3,3),0,0));
+        window.setLocationRelativeTo(null);
+        window.pack();
         window.setVisible(true);
-*/
+        */
     }
   
 }

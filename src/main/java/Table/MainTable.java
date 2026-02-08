@@ -4,14 +4,129 @@
  */
 package Table;
 
+import Date.DatePicker;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
 import yusvel.schedule.employee.Employee;
 
 
 public class MainTable implements Serializable{
-    ArrayList<Employee> Employees;
-    Calendar date;
-    Double workingHoursPerMonth;
+    private ArrayList<Employee> arrEmployees;
+    private Calendar date;
+    private Double workingHoursPerMonth;
+    private String fileName;
+    MainTable(){}
+    MainTable(ArrayList<Employee> arrEmployees,Calendar date, Double workingHoursPerMonth)
+    {
+        if(arrEmployees==null||date==null||workingHoursPerMonth==null||workingHoursPerMonth<0.0)
+        {
+            if(arrEmployees==null){
+                throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(ArrayList<Employee>==NULL ...)");
+            }
+            if(date==null){
+                throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(...,Calendar date == NULL, ...)");
+            } 
+            if(workingHoursPerMonth==null||workingHoursPerMonth<0.0){
+                throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(..., Double workingHoursPerMonth==NULL or < 0.0)");
+            }
+        }
+        this.arrEmployees = arrEmployees;
+        this.date = date;
+        this.workingHoursPerMonth = workingHoursPerMonth;
+        if(arrEmployees.isEmpty())
+        {
+            System.out.println("Load empty arrayList<Emplyee>");
+            /////ToDo/////
+        }
+        
+        fileName = "Schedue_of_"+ date.get(Calendar.MONTH)+1+"_"+date.get(Calendar.YEAR)+".tbl";
+        
+        System.out.println("График на "+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+" "+date.get(Calendar.YEAR)+"год "+ workingHoursPerMonth +" ч.");
+        for(Employee e: arrEmployees) //инициализируем поле ArrayList<Designations> workSchedule 
+        {
+            if(e.getWorkSchedule()==null||e.getWorkSchedule().size()!=date.get(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
+            {
+                e.setWorkSchedule(new ArrayList<Designations>(date.get(Calendar.DAY_OF_MONTH)));
+            }
+        }
+    }
+    ////////////////метод авогенерации массива с обозначениями ArraList<Designations>////////////////////////////////
+     
+    private void genereteDesignations()
+    {
+        for(Employee e:arrEmployees)
+        {
+         
+        }
+    }
+    /////////////////////////Геттеры////////////////////////////////////
+    public ArrayList<Employee> getEmployees(){return arrEmployees;}
+    public Calendar getDate(){return date;};
+    public Double getWorkingHours(){return workingHoursPerMonth;}
+    //////////////////////////Сеттеры////////////////////////////////
+    public void setArrEmployees(ArrayList<Employee> arrEmployees)
+    {
+        if(arrEmployees==null){
+                throw new IllegalArgumentException("В методе недопустимый аргумент: setArrEmployees(ArrayList<Employee> arrEmployees==NULL )");}
+        this.arrEmployees = arrEmployees;
+    }
+    public void setWorkingHoursPerMonth(Double workingHoursPerMonth)
+    {
+        if(workingHoursPerMonth==null||workingHoursPerMonth<0.0){
+                throw new IllegalArgumentException("В методе недопустимый аргумент: setWorkingHoursPerMonth(Double workingHoursPerMonth==NULL or < 0.0)"); }
+        this.workingHoursPerMonth = workingHoursPerMonth;
+    }
+    
+    
+    
+    public void writeTableToFile() throws FileNotFoundException, IOException
+    {
+         File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
+         file.setReadable(true);
+         file.setWritable(true);
+        try(var ois = new ObjectOutputStream(new FileOutputStream(file));)
+        {
+         if(!file.exists()) //создаем файл для записи данных, если он не существует
+         {
+             file.createNewFile();
+             System.out.println("CREATED new file: "+file.getPath());
+         }
+            ois.writeObject(this);
+        }
+        catch(IOException e)
+        {
+            System.out.println("Не удалось записать таблицу в "+file.getPath()+"ErroR:"+e.getMessage());
+        }
+    }
+    public static MainTable readTableFromFile(String fullFileName)throws FileNotFoundException, IOException, ClassNotFoundException
+    {
+         File file = new File(fullFileName);
+         file.setReadable(true);
+         file.setWritable(true);
+         try(var ois = new ObjectInputStream(new FileInputStream(file));)
+            {
+                if(!file.exists()) //создаем файл для записи данных, если он не существует
+                {
+                    throw new FileNotFoundException(fullFileName + " - данного файла нет.");  
+                }
+                return (MainTable)ois.readObject();
+            }
+         catch(IOException e)
+            {
+                System.out.println("Не удалось прочитать таблицу из "+file.getPath()+"ErroR:"+e.getMessage());
+            }
+         finally
+            {
+               return null;
+            }
+    }
 }

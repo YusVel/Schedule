@@ -43,5 +43,6 @@ public class Designations { // объекты обозначения в глав
         else{throw new IllegalArgumentException("IllegalArgumentException: Аргумент, передаваемый конструктору Designation("+val+") не найден в массиве String[] ACCEPTABLE = {\"\",\"У\",\"В\",\"У/В\",\"Б\", \"Ух\", \"У7\",};");}
     }
     public int getValueInt(){return value;}
-    public String getValueString(){return ACCEPTABLE[value];}
+    @Override
+    public String toString(){return ACCEPTABLE[value];}
 }

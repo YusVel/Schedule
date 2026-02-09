@@ -24,8 +24,8 @@ public class MainTable implements Serializable{
     private Calendar date;
     private Double workingHoursPerMonth;
     private String fileName;
-    MainTable(){}
-    MainTable(ArrayList<Employee> arrEmployees,Calendar date, Double workingHoursPerMonth)
+    public MainTable(){}
+    public MainTable(ArrayList<Employee> arrEmployees,Calendar date, Double workingHoursPerMonth)
     {
         if(arrEmployees==null||date==null||workingHoursPerMonth==null||workingHoursPerMonth<0.0)
         {
@@ -50,12 +50,12 @@ public class MainTable implements Serializable{
         
         fileName = "Schedue_of_"+ date.get(Calendar.MONTH)+1+"_"+date.get(Calendar.YEAR)+".tbl";
         
-        System.out.println("График на "+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+" "+date.get(Calendar.YEAR)+"год "+ workingHoursPerMonth +" ч.");
+        System.out.println("График на "+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+" "+date.get(Calendar.YEAR)+"год "+ workingHoursPerMonth +" ч. Будет охранен в "+fileName);
         for(Employee e: arrEmployees) //инициализируем поле ArrayList<Designations> workSchedule 
         {
             if(e.getWorkSchedule()==null||e.getWorkSchedule().size()!=date.get(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
             {
-                e.setWorkSchedule(new ArrayList<Designations>(date.get(Calendar.DAY_OF_MONTH)));
+                e.setWorkSchedule(new ArrayList<Designations>(date.getActualMaximum(Calendar.DAY_OF_MONTH)));
             }
         }
     }
@@ -63,9 +63,25 @@ public class MainTable implements Serializable{
      
     private void genereteDesignations()
     {
-        for(Employee e:arrEmployees)
+        Calendar firstDayMonthofWeek = Calendar.getInstance();
+        firstDayMonthofWeek.set(date.get(Calendar.YEAR),date.get(Calendar.MONTH),1); //первый день текущего месяца
+        
+        for(Employee e:arrEmployees)//проходим по массиву сотрудников
         {
-         
+            int weekDay = firstDayMonthofWeek.get(Calendar.DAY_OF_WEEK);//определяем день недели первого дня месяца
+            for(int i =0;i<date.getActualMaximum(Calendar.DAY_OF_MONTH);i++)//у каждого сотрудника инициализируем массив с графиком работы(обозначений)
+            {
+                int val = 0;
+                Boolean cond = false;
+                weekDay%=7;
+                if(weekDay==0||weekDay==1){val=0;}//если  выходной день, то оставляем пустую ячейку Designation
+                else if(e.getWorkingShift()==true&&i%2==1){val=1;cond=true;} //если смена у доктора нечетная и число нечетное то "У"
+                else if(e.getWorkingShift()==true&&i%2==0){val=2;cond=true;}//если смена у доктора нечетная и число четное то "В"
+                else if(e.getWorkingShift()==false&&i%2==1){val=2;cond=true;} //если смена у доктора нечетная и число нечетное то "В"
+                else if(e.getWorkingShift()==false&&i%2==0){val=1;cond=true;}//если смена у доктора нечетная и число четное то "У"
+                e.getWorkSchedule().get(i).setValue(i, cond);
+                weekDay++; 
+            }
         }
     }
     /////////////////////////Геттеры////////////////////////////////////

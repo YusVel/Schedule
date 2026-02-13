@@ -48,20 +48,21 @@ public class MainTable implements Serializable{
             /////ToDo/////
         }
         
-        fileName = "Schedue_of_"+ date.get(Calendar.MONTH)+1+"_"+date.get(Calendar.YEAR)+".tbl";
+        fileName = "Schedue_of_"+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+"_"+date.get(Calendar.YEAR)+".tbl";
         
         System.out.println("График на "+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+" "+date.get(Calendar.YEAR)+"год "+ workingHoursPerMonth +" ч. Будет охранен в "+fileName);
         for(Employee e: arrEmployees) //инициализируем поле ArrayList<Designations> workSchedule 
         {
-            if(e.getWorkSchedule()==null||e.getWorkSchedule().size()!=date.get(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
+            if(e.getWorkSchedule()==null||e.getWorkSchedule().size()!=date.getActualMaximum(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
             {
                 e.setWorkSchedule(new ArrayList<Designations>(date.getActualMaximum(Calendar.DAY_OF_MONTH)));
             }
         }
+        genereteDesignationsForAllEmployees();
     }
-    ////////////////метод авогенерации массива с обозначениями ArraList<Designations>////////////////////////////////
+    ////////////////метод авогенерации массива с обозначениями ArraList<Designations> у всех сотрудников///////////////////////////////
      
-    private void genereteDesignations()
+    private void genereteDesignationsForAllEmployees()
     {
         Calendar firstDayMonthofWeek = Calendar.getInstance();
         firstDayMonthofWeek.set(date.get(Calendar.YEAR),date.get(Calendar.MONTH),1); //первый день текущего месяца
@@ -79,11 +80,14 @@ public class MainTable implements Serializable{
                 else if(e.getWorkingShift()==true&&i%2==0){val=2;cond=true;}//если смена у доктора нечетная и число четное то "В"
                 else if(e.getWorkingShift()==false&&i%2==1){val=2;cond=true;} //если смена у доктора нечетная и число нечетное то "В"
                 else if(e.getWorkingShift()==false&&i%2==0){val=1;cond=true;}//если смена у доктора нечетная и число четное то "У"
-                e.getWorkSchedule().get(i).setValue(i, cond);
+                e.getWorkSchedule().add(new Designations(val,cond));
                 weekDay++; 
             }
         }
     }
+    
+    //Инициализация массива с обозначениями ArraList<Designations> для одного сотрудника//
+    
     /////////////////////////Геттеры////////////////////////////////////
     public ArrayList<Employee> getEmployees(){return arrEmployees;}
     public Calendar getDate(){return date;};
@@ -117,10 +121,11 @@ public class MainTable implements Serializable{
              System.out.println("CREATED new file: "+file.getPath());
          }
             ois.writeObject(this);
+            System.out.println("Записываем: "+file.getPath());
         }
         catch(IOException e)
         {
-            System.out.println("Не удалось записать таблицу в "+file.getPath()+"ErroR:"+e.getMessage());
+            System.out.println("Не удалось записать таблицу в "+file.getPath()+"ErroR: "+e);
         }
     }
     public static MainTable readTableFromFile(String fullFileName)throws FileNotFoundException, IOException, ClassNotFoundException
@@ -134,15 +139,13 @@ public class MainTable implements Serializable{
                 {
                     throw new FileNotFoundException(fullFileName + " - данного файла нет.");  
                 }
-                return (MainTable)ois.readObject();
+                System.out.println("Загружаем таблицу из "+file.getPath());
+                return (MainTable)ois.readObject(); 
             }
          catch(IOException e)
             {
                 System.out.println("Не удалось прочитать таблицу из "+file.getPath()+"ErroR:"+e.getMessage());
             }
-         finally
-            {
-               return null;
-            }
+    return null;
     }
 }

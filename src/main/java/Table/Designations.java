@@ -4,11 +4,12 @@
  */
 package Table;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import javax.swing.table.AbstractTableModel;
 
 
-public class Designations { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
+public class Designations implements Serializable { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
     final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд", "У7","ОТ"};// //все возможные состояния обозначения
     public static String getAcceptables(){return String.join(",", ACCEPTABLE);}
     private int value; //обозначение в графике У,В,У/В,Б и тд

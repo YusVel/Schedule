@@ -21,26 +21,7 @@ import org.jdesktop.swingx.JXFrame;
 public class Schedule {
 
     public static void main(String[] args) throws  FileNotFoundException, IOException, ClassNotFoundException  {
-        
-       
-        
-        
-        int countE = 24;
-        ArrayList<Employee> arr = new ArrayList<>(24);
-        /*
-        for(int i = 0;i<countE;i++)
-        {
-            arr.add(Employee.create());
-        }
-        Employee.writeToFile(arr);
-        */
-        
-        arr=Employee.readFromFile();
-        MainTable table = new MainTable(arr,Calendar.getInstance(),150.0);
-        for(var e:arr)
-        {
-            out.println(e.getFullName()+" \t"+e.getWorkSchedule()+" "+e.getWorkSchedule().size());
-        }
+  
         
     }
   

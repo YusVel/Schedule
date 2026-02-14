@@ -140,12 +140,18 @@ public class MainTable implements Serializable{
                     throw new FileNotFoundException(fullFileName + " - данного файла нет.");  
                 }
                 System.out.println("Загружаем таблицу из "+file.getPath());
-                return (MainTable)ois.readObject(); 
+                MainTable tmp = (MainTable)ois.readObject(); 
+                return tmp;
             }
          catch(IOException e)
             {
-                System.out.println("Не удалось прочитать таблицу из "+file.getPath()+"ErroR:"+e.getMessage());
+                System.out.println("Не удалось прочитать таблицу из "+file.getPath()+"ErroR:"+e);
             }
     return null;
     }
+   /* @Override
+    public String toString()
+    {
+        return String.format("[%s-%d] %d сотр. ", DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)],date.get(Calendar.YEAR),arrEmployees.size());
+    }*/
 }

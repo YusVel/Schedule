@@ -13,28 +13,35 @@ import yusvel.schedule.employee.Employee;
  */
 public class ScheduleTableModel extends AbstractTableModel implements Serializable{
     MainTable mainTable;
-    ScheduleTableModel(MainTable table)
+    public ScheduleTableModel(MainTable table)
     {
         mainTable = table;
     }
-    
+    public MainTable getMainTable(){return mainTable;}
     @Override
     public int getRowCount() {
         return mainTable.getEmployees().size();
     }
 
     @Override
-    public int getColumnCount() {
-        return mainTable.getDate().getActualMaximum(Calendar.DAY_OF_MONTH);
+    public int getColumnCount() {  
+        return mainTable.getDate().getActualMaximum(Calendar.DAY_OF_MONTH)+2;
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
+        if(columnIndex==0){return mainTable.getEmployees().get(rowIndex).getCabineNumber()+"кб";}
+        if(columnIndex==1){return mainTable.getEmployees().get(rowIndex).getFullName();}
         return mainTable.getEmployees().get(rowIndex)
-                        .getWorkSchedule().get(columnIndex);// из злавной таблицы получаем массив сотрудников по индексу строки определяем
+                        .getWorkSchedule().get(columnIndex-2);// из злавной таблицы получаем массив сотрудников по индексу строки определяем
                                                            //нужного сотрудника и получаем у него массив обозначений(рабочий график) а оттуда
                                                            //получаем по индексу колонки нужное обохзначение(У,В,у/В, ОТ и тд...
     }
     
-    
+    @Override
+    public String getColumnName(int column) {
+        if(column==0){return "";}
+        if(column==1){return "";}
+        return String.valueOf(column-1);
+    }
 }

@@ -11,7 +11,12 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
+import java.awt.Toolkit;
 import java.awt.FileDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.File;
 
 
@@ -20,62 +25,67 @@ import java.util.*;
 import org.jdesktop.swingx.JXFrame;
 
 
-public class Schedule {
-    static JFrame window = new JFrame("Окно");
-    static String path;
-    static FileDialog file = new FileDialog(window,"Выберете файл",FileDialog.LOAD);
-    static JTable table = new JTable();
-    
-    static void getFullFileName()
+public class Schedule extends JFrame implements ActionListener, MouseListener{
+    int width = Toolkit.getDefaultToolkit().getScreenSize().width/2;
+    int height = Toolkit.getDefaultToolkit().getScreenSize().height/2;
+    JButton openButton = new JButton("OPEN");
+    Schedule()
     {
-        file.setFilenameFilter((File dir, String name) -> name.endsWith(".tbl")&&dir.canRead());
-        file.setVisible(true);
-        path = file.getDirectory()+file.getFile();
-        try
-        {
-            MainTable tb = MainTable.readTableFromFile(path);
-            out.println(tb.getDate().get(Calendar.YEAR)+" "+DatePicker.MONTHS_OF_YEAR[tb.getDate().get(Calendar.MONTH)]);
-            table.setModel(new ScheduleTableModel(tb));
-             table.getColumnModel().getColumn(0).setPreferredWidth(10);
-            table.getColumnModel().getColumn(1).setPreferredWidth(200);
-            for(int i = 2;i<table.getColumnCount();i++)
-            {
-                table.getColumnModel().getColumn(i).setPreferredWidth(15);
-            }
-        }
-        catch(Exception e)
-        {
-            out.println(e);
-            
-        }
-        
+        //////////////////////////////////////////////////////////////////////////
+        super("Schedule");
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.setLayout(new BorderLayout());
+        this.setLocationRelativeTo(null);
+        this.setBounds(this.getLocation().x-width/2+70, this.getLocation().y-height/2+40, width, height);
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        openButton.addActionListener(this);
+        this.add(openButton,BorderLayout.WEST);
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        this.setVisible(true);
     }
     public static void main(String[] args) throws  FileNotFoundException, IOException, ClassNotFoundException  {
-  
-        JFrame window = new JFrame("Окно");
-        window.setLayout(new BorderLayout());
-        window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLocationRelativeTo(null);
-      
-        int w = 1200;
-        int h = 800;
-        int y_rel_pos = window.getLocation().y-h/2;
-        int x_rel_pos = window.getLocation().x-w/2;
-        window.setSize(w, h);
-        window.setLocation(x_rel_pos, y_rel_pos);
-        JButton button = new JButton("Открыть");
-        button.addActionListener(e->{getFullFileName();});
-        
-      
+        new Schedule();   
+    }
 
+    
+    
+    
+    
+    @Override
+    public void actionPerformed(ActionEvent e) {
+         out.println("Something CLICKED");
+        if(e.getSource() instanceof JButton b )
+        {
+           if (b.getText().equals("OPEN"))
+           {
+               out.println("OPEN button CLICKED");
+           }
+        }
+    }
 
-        JScrollPane scroll = new JScrollPane(table);
-        //scroll.setPreferredSize(new Dimension(800,700));
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 
-        window.add(scroll,BorderLayout.CENTER);
-        window.add(button,BorderLayout.SOUTH);
-        window.setVisible(true);
-        window.pack();
+    @Override
+    public void mousePressed(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
   
 }

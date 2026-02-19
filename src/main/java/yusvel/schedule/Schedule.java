@@ -25,6 +25,8 @@ import java.io.File;
 import static java.lang.System.out;
 import java.util.*;
 import org.jdesktop.swingx.JXFrame;
+import yusvel.schedule.employee.EmloyeeTableModel;
+import yusvel.schedule.employee.TableEmployees;
 
 
 public class Schedule extends JFrame implements ActionListener, MouseListener{
@@ -33,7 +35,9 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
     
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Файл");
-    JMenu menuOpen = new JMenu("Открыть");
+        JMenu menuOpen = new JMenu("Открыть");
+            JMenuItem openSchedule = new JMenuItem("График");
+            JMenuItem openEmployees = new JMenuItem("Список сотрудников");
     JMenu menuHelp = new JMenu("Help");
     Schedule()
     {
@@ -44,19 +48,20 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         this.setLocationRelativeTo(null);
         this.setBounds(this.getLocation().x-width/2+70, this.getLocation().y-height/2+40, width, height);
         ////////////////////////////////////////////////Настройки меню Файл/////////////////////////////////////////////////////
-        menuFile.add(new JMenu("Открыть"));
-            ((JMenu)menuFile.getMenuComponent(0)).add(new JMenuItem("График"));
-            ((JMenu)menuFile.getMenuComponent(0)).add(new JMenuItem("Список сотрудников"));
+        openEmployees.addActionListener(this);
+        menuOpen.add(openSchedule);
+        menuOpen.add(openEmployees);
+        menuFile.add(menuOpen);
+        
         
         ///////////////////////////////////////////Настройки элементов главного MENU/////////////////////////////////////////////////////
         menuBar.add(menuFile);
-        menuBar.add(new JSeparator(JSeparator.VERTICAL));
-        menuBar.add(menuOpen);
         menuBar.add(new JSeparator(JSeparator.VERTICAL));
         menuBar.add(menuHelp);
         
         ////////////////////////////////////Добавляем все элементы в главное окно/////////////////////////////////
         this.setJMenuBar(menuBar);
+        
         ///////////////////////////////////////////////////////////////////////////////////////////////
         this.setVisible(true);
     }
@@ -70,13 +75,25 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
     
     @Override
     public void actionPerformed(ActionEvent e) {
-         out.println("Something CLICKED");
-        if(e.getSource() instanceof JButton b )
+        
+        if(e.getSource() == openEmployees )
         {
-           if (b.getText().equals("OPEN"))
-           {
-               out.println("OPEN button CLICKED");
-           }
+            out.println("OPEN button CLICKED! Table is OPENED");
+            try
+            {
+                JScrollPane scrollTable = new JScrollPane(new TableEmployees(Employee.readFromFile()));
+                this.add(scrollTable,BorderLayout.CENTER);
+                this.repaint(0);
+            }
+            catch(IOException ex)
+            {
+                out.println(ex);
+            }
+            catch(ClassNotFoundException ex)
+            {
+                out.println(ex);
+            }
+            
         }
     }
 

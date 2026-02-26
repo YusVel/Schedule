@@ -135,7 +135,7 @@ public class MainTable implements Serializable{
          file.setWritable(true);
          try(var ois = new ObjectInputStream(new FileInputStream(file));)
             {
-                if(!file.exists()) //создаем файл для записи данных, если он не существует
+                if(!file.exists()) // он не существует?
                 {
                     throw new FileNotFoundException(fullFileName + " - данного файла нет.");  
                 }

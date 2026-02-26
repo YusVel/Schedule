@@ -3,8 +3,10 @@
 package yusvel.schedule;
 import Date.DatePicker;
 import Table.Designations;
+import Table.MainJTable;
 import Table.MainTable;
 import Table.ScheduleTableModel;
+import Table.TblFileFilter;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -12,6 +14,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import yusvel.schedule.employee.Employee;
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
 import java.awt.Toolkit;
 import java.awt.FileDialog;
 import java.awt.Font;
@@ -23,9 +26,13 @@ import java.io.File;
 
 
 import static java.lang.System.out;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 import org.jdesktop.swingx.JXFrame;
+import org.jdesktop.swingx.JXTable;
 import yusvel.schedule.employee.EmloyeeTableModel;
+import yusvel.schedule.employee.EmpFileFilter;
 import yusvel.schedule.employee.TableEmployees;
 
 
@@ -39,6 +46,7 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
             JMenuItem openSchedule = new JMenuItem("График");
             JMenuItem openEmployees = new JMenuItem("Список сотрудников");
     JMenu menuHelp = new JMenu("Help");
+    JTabbedPane tabbedPane = new JTabbedPane();
     Schedule()
     {
         ////////////////////////////////Настройка главного окна//////////////////////////////////////////
@@ -49,6 +57,7 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         this.setBounds(this.getLocation().x-width/2+70, this.getLocation().y-height/2+40, width, height);
         ////////////////////////////////////////////////Настройки меню Файл/////////////////////////////////////////////////////
         openEmployees.addActionListener(this);
+        openSchedule.addActionListener(this);
         menuOpen.add(openSchedule);
         menuOpen.add(openEmployees);
         menuFile.add(menuOpen);
@@ -75,15 +84,16 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
     
     @Override
     public void actionPerformed(ActionEvent e) {
-        
-        if(e.getSource() == openEmployees )
+        if(e.getSource() == openEmployees )//Открываемт аблицу с сотрудниками
         {
-            out.println("OPEN button CLICKED! Table is OPENED");
+            out.println("OPEN button CLICKED! Employees is OPENED");
+            
             try
             {
                 JScrollPane scrollTable = new JScrollPane(new TableEmployees(Employee.readFromFile()));
-                this.add(scrollTable,BorderLayout.CENTER);
-                this.repaint(0);
+                tabbedPane.addTab("Сотрудники",null,scrollTable,"Все сотрудники учреждения");
+                this.add(tabbedPane,BorderLayout.CENTER);
+                tabbedPane.repaint();
             }
             catch(IOException ex)
             {
@@ -92,8 +102,43 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
             catch(ClassNotFoundException ex)
             {
                 out.println(ex);
+            }  
+        }
+        if(e.getSource() == openSchedule )//открываем таблицу с основным графиком
+        {
+            out.println("OPEN button CLICKED! Schedule is OPENED");
+            try
+            {
+                
+                JFileChooser fDialog = new JFileChooser(new File(Paths.get("").toAbsolutePath().toString()));
+                fDialog.setFileFilter(new TblFileFilter());
+                
+                int err = fDialog.showOpenDialog(this);
+                if(err==JFileChooser.APPROVE_OPTION)
+                {
+                    if(fDialog.getSelectedFile().toString().endsWith("tbl"))
+                    {
+                        JScrollPane scrollTable = new JScrollPane(new MainJTable(new ScheduleTableModel(MainTable.readTableFromFile(fDialog.getSelectedFile().toString()))));
+                        tabbedPane.addTab("Сотрудники",null,scrollTable,"Все сотрудники учреждения");
+
+                        this.add(tabbedPane,BorderLayout.CENTER);
+                        this.setMinimumSize(new Dimension(width,height));
+                        this.pack();
+                    }
+                    else
+                    {
+                        JOptionPane.showMessageDialog(this, "Файд должен иметь расширение .tbl!");
+                    }
+                }  
             }
-            
+            catch(IOException ex)
+            {
+                out.println(ex);
+            }
+            catch(ClassNotFoundException ex)
+            {
+                out.println(ex);
+            }  
         }
     }
 

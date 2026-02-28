@@ -56,7 +56,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
             menu.addActionListener(this);
             popup.add(menu);
         }
-        popup.setFont(new Font("Verdena", Font.ITALIC, 12));
+        popup.setFont(new Font("Montserrat", Font.BOLD, 14));
         popup.addSeparator();
         MenuItem menu = new MenuItem("Копировать");
         menu.addActionListener(this);

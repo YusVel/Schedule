@@ -2,6 +2,7 @@
 
 package yusvel.schedule;
 import Date.DatePicker;
+import Table.CreationNewTableDialog;
 import Table.Designations;
 import Table.MainJTable;
 import Table.MainTable;
@@ -223,10 +224,13 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         if(e.getSource()==createSchedule)
         {
             textField.setText("Создать новый график!!");
-            JDialog creationNewSchedule = new JDialog(this,"Создание нового рабочего графика",true);
-            creationNewSchedule.setLocationRelativeTo(this);
-            creationNewSchedule.setVisible(true);
-            
+            try {
+                CreationNewTableDialog dialog = new CreationNewTableDialog(this, Employee.readFromFile());
+            } catch (IOException ex) {
+                textField.setText("Error, can not open file with employeess: "+ex);
+            } catch (ClassNotFoundException ex) {
+                textField.setText("Error, can not find file with employeess: "+ex);
+            }
         }
         if(e.getSource()==addEmployee)
         {

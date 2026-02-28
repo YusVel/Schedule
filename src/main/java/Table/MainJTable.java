@@ -13,20 +13,23 @@ import java.awt.Point;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 import java.util.EventObject;
 import javax.swing.JTable;
 import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
-import org.jdesktop.swingx.event.TableColumnModelExtListener;
+import javax.swing.DefaultListSelectionModel;
 
 /**
  *
  * @author yusup
  */
-public class MainJTable extends JTable implements MouseListener, ActionListener {
+public class MainJTable extends JTable implements MouseListener, ActionListener, KeyListener {
 
     int beginSelectedRow = -1;
     int endSelectedRow = -1;
@@ -37,10 +40,12 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
     int endSelectedRowForCopy = -1;
     int beginSelectedColumnForCopy = -1;
     int endSelectedColumnForCopy = -1;
+    ArrayList<ArrayList<Designations>> arrForCopy = new ArrayList<ArrayList<Designations>>();
 
-    int col;
     ///сохраняем позицию ячейки, где кликали ПКМ
-    int row;
+    int clickedColumnByMousebutton3;
+    int clickedRowByMousebutton3;
+
     static PopupMenu popup = new PopupMenu();
     static String settingEl;
 
@@ -58,14 +63,15 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
         popup.add(menu);
         menu = new MenuItem("Вставить");
         menu.addActionListener(this);
+        menu.setEnabled(false);
         popup.add(menu);
         this.add(popup);
 
         this.setDefaultRenderer(Designations.class, new DesignationCellRenderer());
         this.setDefaultEditor(Designations.class, new DesignationCellEditor());
-
+        this.getSelectionModel().setSelectionMode(DefaultListSelectionModel.SINGLE_INTERVAL_SELECTION);
         this.addMouseListener(this);
-
+        this.addKeyListener(this);
         CellEditor editor = this.getDefaultEditor(Designations.class);
         editor.addCellEditorListener(new CellEditorListener() {
             @Override
@@ -101,8 +107,8 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-                beginSelectedRowForCopy = beginSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
-                endSelectedRowForCopy = endSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
+                beginSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
+                endSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
                 System.out.println("Вы выделили СТРОКУ c №: " + beginSelectedRow + " по № " + endSelectedRow);
 
             
@@ -116,8 +122,8 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
                 if (e.getValueIsAdjusting()) {
                     return;
                 }
-                beginSelectedColumnForCopy = beginSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
-                endSelectedColumnForCopy = endSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
+                beginSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
+                endSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
                 System.out.println("Вы выделили СТОЛБЕЦ c №: " + beginSelectedColumn + " по № " + endSelectedColumn);
 
             
@@ -132,11 +138,12 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-        col = this.columnAtPoint(new Point(e.getX(), e.getY()));
-        row = this.rowAtPoint(new Point(e.getX(), e.getY()));
-        System.out.println("Point(" + col + ", " + row + ")");
-        if (this.getSelectedColumn() > 1 && e.getButton() == 3 && col >= 0 && row >= 0) {
+    public void mouseClicked(MouseEvent e) { //левая кнопка мыши
+        clickedColumnByMousebutton3 = this.columnAtPoint(new Point(e.getX(), e.getY()));
+        clickedRowByMousebutton3 = this.rowAtPoint(new Point(e.getX(), e.getY()));
+        System.out.println("Point(" + clickedRowByMousebutton3 + ", " + clickedColumnByMousebutton3 + ")");
+        if (this.getSelectedColumn() > 1 && e.getButton() == 3 && clickedColumnByMousebutton3 >= 2 && clickedRowByMousebutton3 >= 0) {
+
             popup.show(this, e.getX() + 1, e.getY() + 1);
         }
     }
@@ -163,17 +170,56 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
         if (classElement.equals(MenuItem.class)) {
             switch (((MenuItem) e.getSource()).getLabel()) {
                 case "Копировать":
-                    System.out.println(beginSelectedRowForCopy);
-                    System.out.println(endSelectedRowForCopy);
-                    System.out.println(beginSelectedColumnForCopy);
-                    System.out.println(endSelectedColumnForCopy);
+                    arrForCopy.clear();
+                    int tempR = beginSelectedRowForCopy = beginSelectedRow;
+                    endSelectedRowForCopy = endSelectedRow;
+                    int tempC = beginSelectedColumnForCopy = beginSelectedColumn;
+                    endSelectedColumnForCopy = endSelectedColumn;
+
+                    for (int r = 0; r <= endSelectedRowForCopy - beginSelectedRowForCopy; r++) {
+                        arrForCopy.add(new ArrayList<Designations>());
+                        for (int c = 0; c <= endSelectedColumnForCopy - beginSelectedColumnForCopy; c++) {
+                            arrForCopy.get(r).add(c, new Designations(this.getValueAt(tempR, tempC).toString()));
+                            tempC++;
+                        }
+                        tempC = beginSelectedColumnForCopy;
+                        tempR++;
+                    }
+
+                    for (ArrayList<Designations> r : arrForCopy) {
+                        for (Designations c : r) {
+                            System.out.print(c.toString());
+                        }
+                        System.out.println();
+                    }
+
+                    System.out.println("Скопированы ячейки (" + beginSelectedRowForCopy + ", " + beginSelectedColumnForCopy + "):(" + endSelectedRowForCopy + ", " + endSelectedColumnForCopy + ")");
+                    popup.getItem(popup.getItemCount() - 1).setEnabled(true);
                     break;
                 case "Вставить":
+                    int rPaste = clickedRowByMousebutton3;
+                    int cPaste = clickedColumnByMousebutton3;
+
+                    System.out.println("Вставляем в ячейку " + "(" + rPaste + ", " + cPaste + ")");
+
+                    for (int r = 0; r < arrForCopy.size(); r++) {
+                        for (int c = 0; c < arrForCopy.get(0).size(); c++) {
+                            if (cPaste < this.getColumnCount() && rPaste < this.getRowCount()) {
+                                this.setValueAt(arrForCopy.get(r).get(c), rPaste, cPaste);
+
+                                cPaste++;
+                            }
+
+                        }
+                        cPaste = clickedColumnByMousebutton3;
+                        rPaste++;
+                    }
+                    this.repaint();
 
                     break;
                 default:
-                    for (int c = beginSelectedColumn; c <= endSelectedColumn; c++) {
-                        for (int r = beginSelectedRow; r <= endSelectedRow; r++) {
+                    for (int c = beginSelectedColumn; c <= endSelectedColumn && c >= 2; c++) {
+                        for (int r = beginSelectedRow; r <= endSelectedRow && r >= 0; r++) {
                             this.setValueAt(new Designations(((MenuItem) e.getSource()).getLabel()), r, c);
                         }
                     }
@@ -182,6 +228,62 @@ public class MainJTable extends JTable implements MouseListener, ActionListener 
             }
         }
 
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (this.getSelectedColumn() >= 2 && !e.isControlDown())//если без CTL
+        {
+            switch (e.getKeyChar()) {
+                case 'у':;
+                case 'E':;
+                case 'e':;
+                case 'У':
+                    this.setValueAt(new Designations("У"), this.getSelectedRow(), this.getSelectedColumn());
+                    break;
+                case 'B':;
+                case 'b':;
+                case 'В':;
+                case 'в':
+                    this.setValueAt(new Designations("В"), this.getSelectedRow(), this.getSelectedColumn());
+                    ;
+                    break;
+                default:;
+                    break;
+            }
+        }
+        if (this.getSelectedColumn() >= 2 && e.isAltDown()) //с CTRL
+        {
+            switch (e.getKeyChar()) {
+                case 'у':;
+                case 'E':;
+                case 'e':;
+                case 'У':
+                    this.setValueAt(new Designations("Уд"), this.getSelectedRow(), this.getSelectedColumn());
+                    break;
+                case 'В':;
+                case 'B':;
+                case 'b':;
+                case 'в':
+                    this.setValueAt(new Designations("Вд"), this.getSelectedRow(), this.getSelectedColumn());
+                    break;
+                default:;
+                    break;
+            }
+        }
+        if (this.getSelectedColumn() >= 2 && e.getKeyChar() == KeyEvent.VK_DELETE) {
+            this.setValueAt(new Designations(" "), this.getSelectedRow(), this.getSelectedColumn());
+        }
+
+        this.repaint();
+    }
+
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
     }
 
 }

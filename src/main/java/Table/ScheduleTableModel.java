@@ -11,7 +11,7 @@ import javax.swing.JLabel;
  *
  * @author yusup
  */
-public class ScheduleTableModel extends AbstractTableModel implements Serializable{
+public class ScheduleTableModel extends AbstractTableModel{
     MainTable mainTable;
     public ScheduleTableModel(MainTable table)
     {

@@ -10,7 +10,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class Designations implements Serializable { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
-    final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд", "У7","ОТ"};// //все возможные состояния обозначения
+    final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд","Вд", "У7","ОТ"};// //все возможные состояния обозначения
     public static String getAcceptables(){return String.join(",", ACCEPTABLE);}
     private int value; //обозначение в графике У,В,У/В,Б и тд
     private Boolean condition = true; //Действительно ли выходил на работу

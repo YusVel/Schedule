@@ -25,7 +25,24 @@ public class DesignationCellRenderer implements TableCellRenderer {
         int thicknessLine = 2;
 
         component.setFont(new Font("Verdena", Font.PLAIN, 14));
+        if (isSelected) {
+            component.setBackground(new Color(117, 184, 255));
+        } else {
+            component.setBackground(new Color(252, 252, 217));
+            Calendar tempDate = Calendar.getInstance();
+            tempDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), column - 2);
+            tempDate.setFirstDayOfWeek(Calendar.MONDAY);
+            if ((tempDate.get(Calendar.DAY_OF_WEEK) == 6 || tempDate.get(Calendar.DAY_OF_WEEK) == 7) && column > 1)// если выходной день то ячейка серая
+            {
+                component.setBackground(new Color(212, 210, 210));
+            }
+        }
+        if (hasFocus) {
+            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 242), thicknessLine, false));
+        } else {
+            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 242), 0, false));
 
+        }
         if (column > 1) {
             if (value.getClass().equals(String.class)) {
                 System.out.println("Рисуем");
@@ -51,25 +68,6 @@ public class DesignationCellRenderer implements TableCellRenderer {
         }
         if (row == 0) {
             component.setBorder(BorderFactory.createMatteBorder(thicknessLine, 0, 0, 0, Color.BLACK)); //граница сверху
-        }
-
-        if (isSelected) {
-            component.setBackground(new Color(117, 184, 255));
-        } else {
-            component.setBackground(new Color(252, 252, 217));
-            Calendar tempDate = Calendar.getInstance();
-            tempDate.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), column - 2);
-            tempDate.setFirstDayOfWeek(Calendar.MONDAY);
-            if ((tempDate.get(Calendar.DAY_OF_WEEK) == 6 || tempDate.get(Calendar.DAY_OF_WEEK) == 7) && column > 1)// если выходной день то ячейка серая
-            {
-                component.setBackground(new Color(212, 210, 210));
-            }
-        }
-        if (hasFocus) {
-            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 242), thicknessLine, false));
-        } else {
-            component.setBorder(BorderFactory.createLineBorder(new Color(80, 80, 242), 0, false));
-
         }
 
         return component;

@@ -1,13 +1,21 @@
 package Table;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Calendar;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
@@ -20,9 +28,9 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellRenderer;
 import yusvel.schedule.employee.Employee;
 
-public class CreationNewTableDialog extends JDialog {
+public class CreationNewTableDialog extends JDialog implements ActionListener {
 
-    static final Font FONT = new Font("Verdena", Font.PLAIN, 16);
+    static final Font FONT = new Font("Verdena", Font.PLAIN, 14);
     Calendar date = Calendar.getInstance();
     Float workingHour;
     JLabel workingHourlabel = new JLabel("Количество часов \nв текущем месяце: ");
@@ -33,22 +41,74 @@ public class CreationNewTableDialog extends JDialog {
     JComboBox yearCombobox = new JComboBox();
     JLabel employeesLabel = new JLabel("Список сотрудников");
     JLabel filters = new JLabel("Фильтры");
+    JLabel postsLabel = new JLabel("по должностям:");
+    JLabel departmentsLabel = new JLabel("по отделениям:");
+    JPanel filtersPanel = new JPanel();
+    JPanel filtersPanelPosts = new JPanel(new GridLayout(6, 2));
+    
+    JPanel filtersPanelDepartments = new JPanel(new GridLayout(5, 1));
+
+    ArrayList<JCheckBox> arrayCheckBoxesOfPosts = new ArrayList<JCheckBox>();
+    ArrayList<JCheckBox> arrayCheckBoxesOfDepartments = new ArrayList<JCheckBox>();
+
     JScrollPane scrollTable;
+
+    Insets insets = new Insets(3, 3, 3, 3);
 
     public CreationNewTableDialog(JFrame owner, ArrayList<Employee> employees) {
         super(owner, "Создание новой таблицы");
         this.setModal(true);
         this.setLocationRelativeTo(null);
-        this.setLayout(new GridLayout());
+        this.setLayout(new GridBagLayout());
 
-        workingHourlabel.setFont(FONT);
         scrollTable = new JScrollPane(new CheckBoxEmployeesTable(employees));
 
-        this.add(scrollTable);
+        workingHourlabel.setFont(FONT);
+        monthLabel.setFont(FONT);
+        monthCombobox.setPreferredSize(new Dimension(80, 20));
+        yearLabel.setFont(FONT);
+        yearCombobox.setPreferredSize(new Dimension(80, 20));
+        employeesLabel.setFont(FONT);
+        filters.setFont(new Font("Verdena", Font.BOLD, 14));
+        filtersPanel.setLayout(new GridBagLayout());
 
+        for (int i = 0; i < Employee.POSTS.length; i++) {
+            JCheckBox checbox = new JCheckBox(Employee.POSTS[i]);
+            checbox.addActionListener(this);
+            filtersPanelPosts.add(checbox, BorderLayout.CENTER);
+            arrayCheckBoxesOfPosts.add(checbox);
+        }
+        for (int i = 0; i < Employee.DEPARTMENTS.length; i++) {
+            JCheckBox checbox = new JCheckBox(Employee.DEPARTMENTS[i]);
+            checbox.addActionListener(this);
+            filtersPanelDepartments.add(checbox, BorderLayout.CENTER);
+            arrayCheckBoxesOfDepartments.add(checbox);
+        }
+
+        filtersPanel.add(filtersPanelPosts, new GridBagConstraints(0, 0, 2, 5, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, insets, 0, 0));
+        filtersPanel.add(new JSeparator(JSeparator.VERTICAL), new GridBagConstraints(2, 0, 1, 5, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, new Insets(3, 3, 3, 10), 0, 0));
+        filtersPanel.add(filtersPanelDepartments, new GridBagConstraints(3, 0, 1, 5, 0, 0, GridBagConstraints.WEST, GridBagConstraints.VERTICAL, insets, 0, 0));
+
+        this.add(monthLabel, new GridBagConstraints(0, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(yearLabel, new GridBagConstraints(1, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(workingHourlabel, new GridBagConstraints(2, 0, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(monthCombobox, new GridBagConstraints(0, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(yearCombobox, new GridBagConstraints(1, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(workingHourTextField, new GridBagConstraints(2, 1, 1, 1, 1.0, 1.0, GridBagConstraints.NORTH, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(new JSeparator(JSeparator.HORIZONTAL),new GridBagConstraints(0, 3, 3, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(filters, new GridBagConstraints(0, 4, 3, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(postsLabel,new GridBagConstraints(0,5,2,1,1.0,1.0,GridBagConstraints.WEST,GridBagConstraints.NONE,insets,0,0));
+        this.add(departmentsLabel,new GridBagConstraints(2,5,1,1,1.0,1.0,GridBagConstraints.CENTER,GridBagConstraints.NONE,insets,0,0));
+        this.add(filtersPanel, new GridBagConstraints(0, 6, 3, 1, 1.0, 1.0, GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, insets, 0, 0));
+        this.add(scrollTable,new GridBagConstraints(0,7,3,1,1.0,1.0,GridBagConstraints.WEST,GridBagConstraints.NONE,insets,0,0));
         this.pack();
         this.setResizable(false);
         this.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
@@ -146,7 +206,7 @@ class CheckBoxEmployeesTableModel extends AbstractTableModel //модель та
                 case 1 ->
                     ret = Employee.POSTS[emp.getPost()];
                 case 2 ->
-                    ret = Employee.DEPARTMENTS[emp.getDepartment()].startsWith("Лечебное")?Employee.DEPARTMENTS[emp.getPost()].substring(19):Employee.DEPARTMENTS[emp.getPost()];
+                    ret = Employee.DEPARTMENTS[emp.getDepartment()].startsWith("Лечебное") ? Employee.DEPARTMENTS[emp.getPost()].substring(19) : Employee.DEPARTMENTS[emp.getPost()];
             }
             return ret;
         } else {

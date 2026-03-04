@@ -92,6 +92,9 @@ public class MainTable implements Serializable{
     public ArrayList<Employee> getEmployees(){return arrEmployees;}
     public Calendar getDate(){return date;};
     public Double getWorkingHours(){return workingHoursPerMonth;}
+    public String getShortFileNameToSave() {
+        return fileName;
+    }
     //////////////////////////Сеттеры////////////////////////////////
     public void setArrEmployees(ArrayList<Employee> arrEmployees)
     {
@@ -108,9 +111,9 @@ public class MainTable implements Serializable{
     
     
     
-    public void writeTableToFile() throws FileNotFoundException, IOException
+    public void writeTableToFile(String fullPath) throws FileNotFoundException
     {
-         File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
+         File file = new File(fullPath);
          file.setReadable(true);
          file.setWritable(true);
         try(var ois = new ObjectOutputStream(new FileOutputStream(file));)

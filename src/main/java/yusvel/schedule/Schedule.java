@@ -22,8 +22,13 @@ import java.awt.FileDialog;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.event.ChangeListener;
 import java.io.File;
 
 
@@ -31,6 +36,7 @@ import static java.lang.System.out;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import javax.swing.event.ChangeEvent;
 import org.jdesktop.swingx.JXFrame;
 import org.jdesktop.swingx.JXTable;
 import org.jdesktop.swingx.JXTextField;
@@ -42,8 +48,8 @@ import yusvel.schedule.employee.TableEmployees;
 public class Schedule extends JFrame implements ActionListener, MouseListener{
     int width = Toolkit.getDefaultToolkit().getScreenSize().width/2;
     int height = Toolkit.getDefaultToolkit().getScreenSize().height/2;
-    ArrayList<MainTable> arrayTableModels = new ArrayList<MainTable>();
-    
+    ArrayList<MainTable> arrayMainTables = new ArrayList<MainTable>();
+    String fileNameToSave;
     
     JMenuBar menuBar = new JMenuBar();
     JMenu menuFile = new JMenu("Файл");
@@ -61,7 +67,7 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
             JButton editEmployee = new JButton(new ImageIcon(Paths.get("icons","edit_employee.png").toAbsolutePath().toString()));   
     JMenu menuHelp = new JMenu("Help");
     JTabbedPane tabbedPane = new JTabbedPane();
-    JTextField textField = new JXTextField();
+    JTextField outputConsolLine = new JXTextField();
     Schedule()
     {
         String str = Paths.get("icons","arrow_back.ico").toAbsolutePath().toString();
@@ -122,15 +128,17 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         menuTools.add(editEmployee);
         menuTools.setOrientation(JToolBar.VERTICAL);
         menuTools.setFloatable(false);
+        ////////////////////////////////Настройка TabedPane///////////////////////////////////////////////
+        tabbedPane.setBorder(BorderFactory.createLoweredBevelBorder());
         ///////////////////////////////////Строка состояния////////////////////////////////////////////////
-        textField.setBorder(BorderFactory.createLoweredBevelBorder());
-        textField.setEditable(false);
-        textField.setFont(new Font("Verdena", Font.ITALIC, 14));
+        outputConsolLine.setBorder(BorderFactory.createLoweredBevelBorder());
+        outputConsolLine.setEditable(false);
+        outputConsolLine.setFont(new Font("Verdena", Font.ITALIC, 14));
         ////////////////////////////////////Добавляем все элементы в главное окно/////////////////////////////////
         this.setJMenuBar(menuBar);
         this.add(menuTools,BorderLayout.WEST);
-        this.add(textField,BorderLayout.SOUTH);
-        
+        this.add(outputConsolLine,BorderLayout.SOUTH);
+        this.add(tabbedPane,BorderLayout.CENTER);
       
         ///////////////////////////////////////////////////////////////////////////////////////////////
         this.setVisible(true);
@@ -139,7 +147,13 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         new Schedule();   
     }
 
-    
+    public void addScrollTable(JScrollPane scrollTable)
+    {
+        MainTable table = ((ScheduleTableModel)((MainJTable)scrollTable.getViewport().getView()).getModel()).getMainTable();
+        tabbedPane.addTab(String.format("%s %d", DatePicker.MONTHS_OF_YEAR[table.getDate().get(Calendar.MONTH)].toUpperCase(),table.getDate().get(Calendar.YEAR)), null,scrollTable,"");
+        arrayMainTables.add(table);
+        this.repaint();
+    }
     
     
     
@@ -151,7 +165,7 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
             
             try
             {
-                JScrollPane scrollTable = new JScrollPane(new TableEmployees(Employee.readFromFile()));
+                JScrollPane scrollTable = new JScrollPane(new TableEmployees(Employee.readFromFile(),EmloyeeTableModel.SELECTABLE));
                 tabbedPane.addTab("Сотрудники",null,scrollTable,"Все сотрудники учреждения");
                 this.add(tabbedPane,BorderLayout.CENTER);
                 tabbedPane.repaint();
@@ -175,18 +189,16 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
                 
                 JFileChooser fDialog = new JFileChooser(new File(Paths.get("").toAbsolutePath().toString()));
                 fDialog.setFileFilter(new TblFileFilter());
-                
+                fDialog.setAcceptAllFileFilterUsed(false);
                 int err = fDialog.showOpenDialog(this);
                 if(err==JFileChooser.APPROVE_OPTION)
                 {
                     if(fDialog.getSelectedFile().toString().endsWith("tbl"))
                     {
                         MainTable table = MainTable.readTableFromFile(fDialog.getSelectedFile().toString());
-                        arrayTableModels.add(table);
+                        arrayMainTables.add(table);
                         JScrollPane scrollTable = new JScrollPane(new MainJTable(new ScheduleTableModel(table)));
                         tabbedPane.addTab(String.format("%s %d", DatePicker.MONTHS_OF_YEAR[table.getDate().get(Calendar.MONTH)].toUpperCase(),table.getDate().get(Calendar.YEAR)),null,scrollTable,"Все сотрудники учреждения");
-
-                        this.add(tabbedPane,BorderLayout.CENTER);
                         this.setMinimumSize(new Dimension(width,height));
                         this.pack();
                     }
@@ -207,47 +219,99 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
         }
         if(e.getSource()==back)
         {
-            textField.setText("Откатить изменения!!");
+            outputConsolLine.setText("Откатить изменения!!");
         }
         if(e.getSource()==forward)
         {
-            textField.setText("Накатить изменения!!");
+            outputConsolLine.setText("Накатить изменения!!");
         }
-        if(e.getSource()==save)
+        if(e.getSource()==save)///////////////СОХРАНИТЬ///////////////
         {
-            textField.setText("Сохранить!!");
+            if (arrayMainTables.isEmpty()) {
+                outputConsolLine.setText("What? Нет ни обной таблицы для сохранения");
+            } else {
+                fileNameToSave = arrayMainTables.get(tabbedPane.getSelectedIndex()).getShortFileNameToSave();
+                outputConsolLine.setText("Сохраняем в " + Paths.get(fileNameToSave).toAbsolutePath().toString());
+
+                try {
+                    arrayMainTables.get(tabbedPane.getSelectedIndex()).writeTableToFile(Paths.get(fileNameToSave).toAbsolutePath().toString());
+                } catch (FileNotFoundException ex) {
+                    outputConsolLine.setText("Ошибка сохранения файла: " + ex);
+                }
+            }
+
         }
-        if(e.getSource()==saveAs)
-        {
-            textField.setText("Сохранить как!!");
+        if (e.getSource() == saveAs) {/////////////СОХРАНИТЬ КАК////////////
+            if (arrayMainTables.isEmpty()) {
+                outputConsolLine.setText("What? Нет ни обной таблицы для сохранения");
+            } else {
+                outputConsolLine.setText("Сохранить как!!");
+                JFileChooser fDialog = new JFileChooser(new File(Paths.get("").toAbsolutePath().toString()));
+                fDialog.setDialogType(JFileChooser.SAVE_DIALOG);
+                fDialog.setAcceptAllFileFilterUsed(false);
+                fDialog.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+                fDialog.setFileFilter(new TblFileFilter());
+                fileNameToSave = arrayMainTables.get(tabbedPane.getSelectedIndex()).getShortFileNameToSave();
+                fDialog.setSelectedFile(new File(fileNameToSave));
+                int err = fDialog.showSaveDialog(this);
+                switch (err) {
+                    case JFileChooser.APPROVE_OPTION -> {
+                        fDialog.setDialogTitle("Сохранить как");
+
+                        try {
+                            outputConsolLine.setText("Сохраняем в "+fDialog.getSelectedFile().toString());
+                            arrayMainTables.get(tabbedPane.getSelectedIndex()).writeTableToFile(fDialog.getSelectedFile().toString());
+                        } catch (FileNotFoundException ex) {
+                            outputConsolLine.setText("Невозможно сохранить файл: "+fDialog.getSelectedFile().toString());
+                        }
+
+                    }
+                    case JFileChooser.ERROR_OPTION ->
+                        JOptionPane.showMessageDialog(this, "Невозможно сохранить", "ERROR!", JOptionPane.WARNING_MESSAGE);
+                    case JFileChooser.CANCEL_OPTION ->
+                        outputConsolLine.setText("Сохранение отменено!");
+                    default -> {
+                    }
+                }
+            }
+
         }
-        if(e.getSource()==createSchedule)
+        if(e.getSource()==createSchedule)///////////////////СОздать новый График//////////////////////////////
         {
-            textField.setText("Создать новый график!!");
+            outputConsolLine.setText("Создать новый график!!");
             try {
                 CreationNewTableDialog dialog = new CreationNewTableDialog(this, Employee.readFromFile());
             } catch (IOException ex) {
-                textField.setText("Error, can not open file with employeess: "+ex);
+                outputConsolLine.setText("Error, can not open file with employeess: "+ex);
             } catch (ClassNotFoundException ex) {
-                textField.setText("Error, can not find file with employeess: "+ex);
+                outputConsolLine.setText("Error, can not find file with employeess: "+ex);
             }
         }
         if(e.getSource()==addEmployee)
         {
-            textField.setText("Добавить сотрудника!!");
+            if(tabbedPane.getComponentCount()==0)
+            {
+                outputConsolLine.setText("Для того, чтобы  добавить сотрудника, создайте сначала ссоздайте таблицу");
+            }
+            else{
+                outputConsolLine.setText("Добавить сотрудника!!");
+                
+            }
         }
         if(e.getSource()==removeEmployee)
         {
-            textField.setText("Удалить сотрудника!!");
+            outputConsolLine.setText("Удалить сотрудника!!");
         }
         if(e.getSource()==editEmployee)
         {
-            textField.setText("Редактировать карту сотрудника!!");
+            outputConsolLine.setText("Редактировать карту сотрудника!!");
         }
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {}
+    public void mouseClicked(MouseEvent e) {
+
+    }
 
     @Override
     public void mousePressed(MouseEvent e) {}
@@ -269,5 +333,4 @@ public class Schedule extends JFrame implements ActionListener, MouseListener{
             ((JButton)e.getSource()).setBackground(new Color(212, 210, 210));
         }
     }
-
 }

@@ -57,4 +57,15 @@ public class ScheduleTableModel extends AbstractTableModel{
     public Class<?> getColumnClass(int columnIndex) {
     return Designations.class;
     }
+    public Calendar getDate()
+    {
+        return mainTable.getDate();
+    }
+    public Double getWorkingHour()
+    {
+        return mainTable.getWorkingHours();
+    }
+    public ArrayList<Employee> getEmployees() {
+        return mainTable.getEmployees();
+    }
 }

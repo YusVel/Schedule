@@ -46,8 +46,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
     int clickedColumnByMousebutton3;
     int clickedRowByMousebutton3;
 
-    static PopupMenu popup = new PopupMenu();
-    static String settingEl;
+    PopupMenu popup = new PopupMenu();
 
     public MainJTable(ScheduleTableModel tableModel) {
         for (String el : Designations.ACCEPTABLE) //создаем контекстное меню для редактируемых ячеек
@@ -56,7 +55,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
             menu.addActionListener(this);
             popup.add(menu);
         }
-        popup.setFont(new Font("Montserrat", Font.BOLD, 14));
+        popup.setFont(new Font("Montserrat", Font.BOLD, 12));
         popup.addSeparator();
         MenuItem menu = new MenuItem("Копировать");
         menu.addActionListener(this);
@@ -132,9 +131,6 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
                                                                                             }
                                                                                     });
     
-    
-        this.setRowSelectionInterval(2, 2);
-        this.setColumnSelectionInterval(2, 2);
     }
 
     @Override

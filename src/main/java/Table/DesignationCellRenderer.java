@@ -59,13 +59,14 @@ public class DesignationCellRenderer implements TableCellRenderer {
         if (column == 0) {
             component.setText(Byte.toString((Byte) value));
         }
-
-        if (!(row < table.getRowCount() - 1 && employees.get(row).getCabineNumber().equals(employees.get(row + 1).getCabineNumber()))) {
+/* ПЕРЕДЕЛВТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        if (!(row < table.getRowCount() - 1 && employees.get(row).getCabineNumber().equals(employees.get(row+1).getCabineNumber()))) {
             component.setBorder(BorderFactory.createMatteBorder(0, 0, thicknessLine, 0, Color.BLACK));
             if ((employees.get(row).getDepartment().intValue() == 0 && employees.get(row + 1).getDepartment().intValue() == 0)) {
                 component.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 0, Color.BLACK));
             }
         }
+*/
         if (row == 0) {
             component.setBorder(BorderFactory.createMatteBorder(thicknessLine, 0, 0, 0, Color.BLACK)); //граница сверху
         }

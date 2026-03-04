@@ -13,8 +13,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 
 public class TableEmployees extends JTable {
-    public TableEmployees(ArrayList<Employee> Employees){
-        this.setModel(new EmloyeeTableModel(Employees));
+    public TableEmployees(ArrayList<Employee> Employees,int mode){
+        this.setModel(new EmloyeeTableModel(Employees,mode));
         this.getColumnModel().getColumn(0).setPreferredWidth(100);//выставляем ширину колонки с фамилиями
         this.getColumnModel().getColumn(1).setPreferredWidth(60);//с именем
         this.getColumnModel().getColumn(2).setPreferredWidth(100);//с отчеством
@@ -22,6 +22,10 @@ public class TableEmployees extends JTable {
         this.getColumnModel().getColumn(4).setPreferredWidth(30);//должность
         this.getColumnModel().getColumn(5).setPreferredWidth(30);//отделение
         this.getColumnModel().getColumn(6).setPreferredWidth(10);//кабинет
+        if(mode==EmloyeeTableModel.SELECTABLE)
+        {
+            this.getColumnModel().getColumn(7).setPreferredWidth(5);//кабинет
+        }
         
         this.setBackground(new Color(252, 252, 217));
         this.setFont(new Font("Verdena", Font.PLAIN, 18));

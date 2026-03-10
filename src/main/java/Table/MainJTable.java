@@ -49,6 +49,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
     PopupMenu popup = new PopupMenu();
 
     public MainJTable(ScheduleTableModel tableModel) {
+        super(tableModel);
         for (String el : Designations.ACCEPTABLE) //создаем контекстное меню для редактируемых ячеек
         {
             MenuItem menu = new MenuItem(el);
@@ -71,8 +72,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
         this.getSelectionModel().setSelectionMode(DefaultListSelectionModel.SINGLE_INTERVAL_SELECTION);
         this.addMouseListener(this);
         this.addKeyListener(this);
-        CellEditor editor = this.getDefaultEditor(Designations.class);
-        this.setModel(tableModel);
+        //this.setModel(tableModel);
         if (this.getColumnCount() > 5) {
             this.getColumnModel().getColumn(0).setPreferredWidth(30);
             this.getColumnModel().getColumn(1).setPreferredWidth(200);
@@ -97,12 +97,8 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
                 beginSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
                 endSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
                 //System.out.println("Вы выделили СТРОКУ c №: " + beginSelectedRow + " по № " + endSelectedRow);
-
-            
-        
-        ///TODO
-                                                                                            }
-                                                                                    });
+            }
+        });
         this.getColumnModel().getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -116,6 +112,11 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
         });
     }
 
+    private void setNewMainTable(MainTable newOne)
+    {
+        ((ScheduleTableModel)this.getModel()).setNewMainTable(newOne);
+        ((ScheduleTableModel)this.getModel()).fireTableDataChanged();
+    }
     @Override
     public void mouseClicked(MouseEvent e) { //левая кнопка мыши
         clickedColumnByMousebutton3 = this.columnAtPoint(new Point(e.getX(), e.getY()));

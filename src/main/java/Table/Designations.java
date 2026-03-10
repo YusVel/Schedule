@@ -27,6 +27,7 @@ public class Designations implements Serializable { // объекты обозн
         return -1;
     }
     public Designations(){value = 0;condition = false;}
+    public Designations(Designations another){value = another.value;condition = another.condition;} //конструктор копирования
     public Designations(int val,Boolean cond){value = val;condition = cond;}
     public Designations(String val){ //если введен неприемлемый аргумент выбрасываем исключеение (не соответствует ни одному из элментов массива acctptable)
         int index = indexOf(val);

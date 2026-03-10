@@ -31,6 +31,14 @@ class Human implements Serializable
         this.patronomic = patronomic;
         this.bithDay = bithDay;
     }
+    Human(Human another) //кеонструктор полного копирования
+    {
+        this.surname = new String(another.surname);
+        this.name = new String(another.name);
+        this.patronomic = new String(another.patronomic);
+        this.bithDay = (Calendar)another.bithDay.clone();
+        
+    }
     @Override public String toString()
     {
         return surname + ' '+name+' '+patronomic+ " ("+ bithDay.get(Calendar.DAY_OF_MONTH)+"."+ bithDay.get(Calendar.MONTH)+"."+ bithDay.get(Calendar.YEAR)+")\n";
@@ -76,7 +84,7 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
     private ArrayList<Designations> workSchedule; //рабочий график каждого сотрудника
     private boolean workingShift; // кто рабочая смена 1 - нечетные числа - утро(8:00-14:00), 0 нечетные числа - вечер(15:00-21:00)
       
-     Employee()
+    public  Employee()
     {
        super("Surname","Name","Patronomic",Calendar.getInstance());
        workingRate = 3;
@@ -86,16 +94,25 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
        cabinetNumber = 1;
        workingShift = false;
     }
-    Employee(Employee other)
+    public Employee(Employee other)//конструктор полного копирования
     {
-       super(other.surname,other.name,other.patronomic,other.bithDay);
+       super(new String(other.surname),new String(other.name),new String(other.patronomic),(Calendar)other.bithDay.clone());
        workingRate = other.workingRate;
        post = other.post;
        department = other.department;
-       beginEmployment = other.beginEmployment;
-       endEmployment = other.endEmployment;
+       beginEmployment = (Calendar)other.beginEmployment.clone();
+        if (other.endEmployment != null) {
+            endEmployment = (Calendar) other.endEmployment.clone();
+        }
        cabinetNumber = other.cabinetNumber;
-       workSchedule = other.workSchedule;
+       if(other.workSchedule!=null)
+       {
+           workSchedule = new ArrayList<Designations>();
+           for(Designations el:other.workSchedule)
+           {
+               workSchedule.add(new Designations(el));
+           }
+       }
        workingShift = other.workingShift;
     }
     @Override

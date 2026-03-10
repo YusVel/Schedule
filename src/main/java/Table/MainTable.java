@@ -19,14 +19,25 @@ import java.util.Calendar;
 import java.util.Comparator;
 import yusvel.schedule.employee.Employee;
 
-public class MainTable implements Serializable ,Cloneable{
+public class MainTable implements Serializable {
 
     private ArrayList<Employee> arrEmployees;
     private Calendar date;
     private Double workingHoursPerMonth;
     private String fileName;
 
-    public MainTable() {
+    public MainTable(MainTable another) {
+        if(another.arrEmployees!=null)
+        {
+            arrEmployees = new ArrayList<Employee>();
+            for(Employee el:another.arrEmployees)
+            {
+                arrEmployees.add(new Employee(el));
+            }
+        }
+        date = (Calendar)another.date.clone();
+        workingHoursPerMonth = another.workingHoursPerMonth;
+        fileName =new String(another.fileName);
     }
 
     public MainTable(ArrayList<Employee> arrEmployees, Calendar date, Double workingHoursPerMonth) {
@@ -227,10 +238,4 @@ public class MainTable implements Serializable ,Cloneable{
     {
         return String.format("[%s-%d] %d сотр. ", DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)],date.get(Calendar.YEAR),arrEmployees.size());
     }*/
-    
-    @Override
-    public Object clone() 
-    {
-        return new MainTable((ArrayList<Employee>)arrEmployees.clone(),(Calendar)date.clone(),workingHoursPerMonth.doubleValue());
-    }
 }

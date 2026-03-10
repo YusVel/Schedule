@@ -194,7 +194,7 @@ public class Schedule extends JFrame implements ActionListener, MouseListener, C
             tabbedPane.addTab(String.format("%s %d", DatePicker.MONTHS_OF_YEAR[mainTable.getDate().get(Calendar.MONTH)].toUpperCase(), mainTable.getDate().get(Calendar.YEAR)), null, scrollTable, "");
             arrayTableModels.add(tableModel);
             arrayContextsTables.add(new ArrayList<AbstractTableModel>());
-            arrayContextsTables.get(tableCount-1).add(tableModel);// добавляем первый кадр в массив моделей
+            arrayContextsTables.get(tableCount-1).add(new ScheduleTableModel((ScheduleTableModel) tableModel));// добавляем первый кадр в массив моделей
             arrayContextsIPositionsTables.add(0);// У первого кадра поциция 0
         }
         else if (tableModel.getClass().equals(EmployeeTableModel.class)) {
@@ -304,22 +304,26 @@ public class Schedule extends JFrame implements ActionListener, MouseListener, C
                     break;
             }
         }
-        if(e.getSource()==backButton)
+        if(e.getSource()==backButton)//////////////////////Откатить Изменения///////////////////
         {
             creationDialog.setVisible(false);
             if(tabbedPane.getComponentCount()>0)
             {
-                JTable table = ((JTable)((JScrollPane)tabbedPane.getSelectedComponent()).getViewport().getView());
+                JTable table = ((JTable) ((JScrollPane) tabbedPane.getSelectedComponent()).getViewport().getView());
                 removeListenersForChanging(table);
-                int realPosition = arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex());
-                if(realPosition>0)
-                {
-                    arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), realPosition - 1);
-                   table.setModel(arrayContextsTables.get(tabbedPane.getSelectedIndex()).get(realPosition-1));
-                   out.println("Назад");
-                   this.repaint();
+                int currentlPosition = arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex());
+                if (currentlPosition > 0) {
+                    arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentlPosition - 1);
+                    table.setModel(arrayContextsTables.get(tabbedPane.getSelectedIndex()).get(currentlPosition - 1));
+                    table.getColumnModel().getColumn(0).setPreferredWidth(30);
+                    table.getColumnModel().getColumn(1).setPreferredWidth(200);
+                    for (int i = 2; i < table.getColumnCount(); i++) {
+                        table.getColumnModel().getColumn(i).setPreferredWidth(20);
+                    }
+                    this.repaint();
                 }
                 addListenersForChanging(table);
+                out.println("НАЗАД! Количество кадров - " + arrayContextsTables.get(tabbedPane.getSelectedIndex()).size() + ". Позиция(индекс) - " + arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex()));
             }
             else
             {
@@ -327,10 +331,29 @@ public class Schedule extends JFrame implements ActionListener, MouseListener, C
             }
             
         }
-        if(e.getSource()==forwardButton)
-        {
+         ///НАКАТ ИЗМЕНЕНИЙ
+        if (e.getSource() == forwardButton) {
             outputConsolLine.setText("Накатить изменения!!");
             creationDialog.setVisible(false);
+            JTable table = ((JTable) ((JScrollPane) tabbedPane.getSelectedComponent()).getViewport().getView());
+            removeListenersForChanging(table);
+            int currentPosition = arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex());
+            if (currentPosition < arrayContextsTables.get(tabbedPane.getSelectedIndex()).size() - 1) {
+                arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition + 1);
+                table.setModel(arrayContextsTables.get(tabbedPane.getSelectedIndex()).get(currentPosition + 1));
+                table.getColumnModel().getColumn(0).setPreferredWidth(30);
+                table.getColumnModel().getColumn(1).setPreferredWidth(200);
+                for (int i = 2; i < table.getColumnCount(); i++) {
+                    table.getColumnModel().getColumn(i).setPreferredWidth(20);
+                }
+                this.repaint();
+                out.println("ВПЕРЕД! Количество кадров - " + arrayContextsTables.get(tabbedPane.getSelectedIndex()).size() + ". Позиция(индекс) - " + arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex()));
+            }
+            else
+            {
+                 out.println("Нечего накатывать!!");
+            }
+            addListenersForChanging(table);
         }
         if(e.getSource()==saveButton)///////////////СОХРАНИТЬ///////////////
         {
@@ -617,13 +640,25 @@ public class Schedule extends JFrame implements ActionListener, MouseListener, C
 
     @Override
     public void editingStopped(ChangeEvent e) {
-       /* try {
-            arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex())+1);
-            arrayContextsTables.get(tabbedPane.getSelectedIndex()).add((AbstractTableModel)((ScheduleTableModel)arrayTableModels.get(tabbedPane.getSelectedIndex())).clone());
-        } catch (CloneNotSupportedException ex) {
-            out.println("Произошла ошибка CloneNotSupportedException "+ ex);
-        }*/
-        out.println("Изменения в таблице № "+tabbedPane.getSelectedIndex()+ " сохранены! Количество кадров - "+arrayContextsTables.get(tabbedPane.getSelectedIndex()).size()+ ". Позиция - "+arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex()));
+        JTable table = ((JTable) ((JScrollPane) tabbedPane.getSelectedComponent()).getViewport().getView());
+        AbstractTableModel tableModel = (AbstractTableModel) table.getModel();
+        int currentPosition = arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex());
+        int sizeСurrentArrayContextsTable = arrayContextsTables.get(tabbedPane.getSelectedIndex()).size();
+        ArrayList<AbstractTableModel> array = arrayContextsTables.get(tabbedPane.getSelectedIndex());
+        if (currentPosition != sizeСurrentArrayContextsTable - 1) //если мы внесли изменения в таблицы, которая откатывалась, то все следующие кадры мы удвляем
+        {
+            out.println("Текущая позиция(индекс): " + currentPosition + " Размер массива: " + sizeСurrentArrayContextsTable);
+            array.removeAll(array.subList(currentPosition +1, sizeСurrentArrayContextsTable));
+            array.getClass();
+           // arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition);
+           // arrayContextsTables.get(tabbedPane.getSelectedIndex()).set(currentPosition, new ScheduleTableModel((ScheduleTableModel) tableModel));
+        } else {
+            arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition + 1);
+            arrayContextsTables.get(tabbedPane.getSelectedIndex()).add(new ScheduleTableModel((ScheduleTableModel) tableModel));
+        }
+
+
+        out.println("Изменения в таблице № " + tabbedPane.getSelectedIndex() + " сохранены! Количество кадров - " + arrayContextsTables.get(tabbedPane.getSelectedIndex()).size() + ". Позиция(индекс) - " + arrayContextsIPositionsTables.get(tabbedPane.getSelectedIndex()));
     }
 
     @Override

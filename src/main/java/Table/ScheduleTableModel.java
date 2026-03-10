@@ -12,7 +12,7 @@ import javax.swing.event.TableModelEvent;
  *
  * @author yusup
  */
-public class ScheduleTableModel extends AbstractTableModel implements Cloneable  {
+public class ScheduleTableModel extends AbstractTableModel{
 
     MainTable mainTable;
     private Integer ID = -1;
@@ -21,6 +21,13 @@ public class ScheduleTableModel extends AbstractTableModel implements Cloneable 
         mainTable = table;
     }
 
+    public ScheduleTableModel(ScheduleTableModel tableModel) {
+        mainTable = new MainTable(tableModel.getMainTable());
+    }
+    public void setNewMainTable(MainTable newOne)
+    {
+        mainTable = newOne;
+    }
     public MainTable getMainTable() {
         return mainTable;
     }
@@ -105,10 +112,5 @@ public class ScheduleTableModel extends AbstractTableModel implements Cloneable 
 
     public boolean equalsForSaveContext(Object obj) {
         return this.getClass().equals(obj.getClass()) && this.ID.equals(((ScheduleTableModel) obj).ID) && this.ID >= 0 && ((ScheduleTableModel) obj).ID >= 0;
-    }
-    @Override
-    public Object clone() throws CloneNotSupportedException
-    {
-        return new ScheduleTableModel((MainTable)mainTable.clone());
     }
 }

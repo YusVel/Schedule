@@ -25,7 +25,7 @@ public class DesignationCellEditor extends JXTextField implements TableCellEdito
     List designationCellEditorLiseners = new ArrayList(); //так как данный редакор генерирует события отмена редактирование и конец редактирования то мы должы регестрировать слушателей, которые будут реагировать на синалы от редактора.
     private ChangeEvent event = new ChangeEvent(this);
     static PopupMenu popup = new PopupMenu();
-    Designations previousStateCell = ;
+    Designations previousStateCell;
     int col;
     int row;
     DesignationCellEditor() {
@@ -80,7 +80,7 @@ public class DesignationCellEditor extends JXTextField implements TableCellEdito
         try {
             // System.out.println("Проверяем: "+this.getText());
             s = new Designations(this.getText());
-            if (!previousStateCell.equals(s)) {
+            if (previousStateCell==null||!previousStateCell.equals(s)) {
                 for (int i = 0; i < designationCellEditorLiseners.size(); i++) {
                     ((CellEditorListener) designationCellEditorLiseners.get(i)).editingStopped(event);
                 }

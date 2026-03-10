@@ -57,7 +57,7 @@ import yusvel.schedule.employee.WindowEmployeeCreator;
 
 public class Schedule extends JFrame implements ActionListener, MouseListener, ComponentListener, CellEditorListener{
     private int tableCount = 0;
-    int width = Toolkit.getDefaultToolkit().getScreenSize().width/2;
+    int width = Toolkit.getDefaultToolkit().getScreenSize().width/2+300;
     int height = Toolkit.getDefaultToolkit().getScreenSize().height/2;
     ArrayList<AbstractTableModel> arrayTableModels = new ArrayList<AbstractTableModel>(); //массив всех таблиц в главном окне
     ArrayList<ArrayList<AbstractTableModel>> arrayContextsTables = new ArrayList<ArrayList<AbstractTableModel>>();//здесь будем сохранять состояние таблиц
@@ -649,9 +649,10 @@ public class Schedule extends JFrame implements ActionListener, MouseListener, C
         {
             out.println("Текущая позиция(индекс): " + currentPosition + " Размер массива: " + sizeСurrentArrayContextsTable);
             array.removeAll(array.subList(currentPosition +1, sizeСurrentArrayContextsTable));
-            array.getClass();
-           // arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition);
-           // arrayContextsTables.get(tabbedPane.getSelectedIndex()).set(currentPosition, new ScheduleTableModel((ScheduleTableModel) tableModel));
+            
+            arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition);
+            arrayContextsTables.get(tabbedPane.getSelectedIndex()).set(currentPosition,new ScheduleTableModel((ScheduleTableModel) tableModel));
+            
         } else {
             arrayContextsIPositionsTables.set(tabbedPane.getSelectedIndex(), currentPosition + 1);
             arrayContextsTables.get(tabbedPane.getSelectedIndex()).add(new ScheduleTableModel((ScheduleTableModel) tableModel));

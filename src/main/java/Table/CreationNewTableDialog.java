@@ -43,6 +43,8 @@ import javax.swing.text.DocumentFilter;
 import javax.swing.text.PlainDocument;
 import yusvel.schedule.Schedule;
 import yusvel.schedule.employee.Employee;
+import yusvel.schedule.employee.EmployeeTableModel;
+import yusvel.schedule.employee.TableEmployees;
 
 public class CreationNewTableDialog extends JDialog implements ActionListener, KeyListener {
 
@@ -58,7 +60,7 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
     JTextField yearTextField = new JTextField(String.valueOf(Calendar.getInstance().get(Calendar.YEAR)));
     JLabel employeesLabel = new JLabel("Список сотрудников");
     JLabel filters = new JLabel("Фильтры");
-    JCheckBox allFilters = new JCheckBox("Все",true);
+    JCheckBox allFilters = new JCheckBox("Все",false);
     JLabel postsLabel = new JLabel("по должностям:");
     JLabel departmentsLabel = new JLabel("по отделениям:");
     JPanel filtersPanel = new JPanel();
@@ -80,7 +82,7 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
         this.setLocation(owner.getX() + 250, owner.getY() + 50);
         this.setLayout(new GridBagLayout());
 
-        scrollTable = new JScrollPane(new CheckBoxEmployeesTable(employees));
+        scrollTable = new JScrollPane(new TableEmployees(employees, EmployeeTableModel.SELECTABLE));
         scrollTable.setPreferredSize(new Dimension(500, 300));
         createButton.addActionListener(this);
 
@@ -104,13 +106,13 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
         filtersPanel.setLayout(new GridBagLayout());
 
         for (int i = 0; i < Employee.POSTS.length; i++) {
-            JCheckBoxListener checbox = new JCheckBoxListener(Employee.POSTS[i],true);
+            JCheckBoxListener checbox = new JCheckBoxListener(Employee.POSTS[i],false);
             checbox.addActionListener(this);
             filtersPanelPosts.add(checbox, BorderLayout.CENTER);
             arrayCheckBoxesOfPosts.add(checbox);
         }
         for (int i = 0; i < Employee.DEPARTMENTS.length; i++) {
-            JCheckBoxListener checbox = new JCheckBoxListener(Employee.DEPARTMENTS[i],true);
+            JCheckBoxListener checbox = new JCheckBoxListener(Employee.DEPARTMENTS[i],false);
             checbox.addActionListener(this);
             filtersPanelDepartments.add(checbox, BorderLayout.CENTER);
             arrayCheckBoxesOfDepartments.add(checbox);
@@ -148,25 +150,25 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
             for (JCheckBoxListener el : arrayCheckBoxesOfDepartments) {
                 el.setSelected(allFilters.isSelected());
             }
-            CheckBoxEmployeesTable table = (CheckBoxEmployeesTable) scrollTable.getViewport().getView();
+            TableEmployees table = (TableEmployees) scrollTable.getViewport().getView();
             table.chekBoxfilter(((JCheckBox)e.getSource()).getText(), ((JCheckBox)e.getSource()).isSelected());
         }
         if (e.getSource().getClass().equals(JCheckBoxListener.class)) {
             System.out.println("Фильтр: "+((JCheckBoxListener)e.getSource()).getText()+" - "+((JCheckBoxListener)e.getSource()).isSelected());
-            CheckBoxEmployeesTable table = (CheckBoxEmployeesTable) scrollTable.getViewport().getView();
+            TableEmployees table = (TableEmployees) scrollTable.getViewport().getView();
             table.chekBoxfilter(((JCheckBoxListener)e.getSource()).getText(), ((JCheckBoxListener)e.getSource()).isSelected());
         }
         if(e.getSource()==createButton)
         {
             System.out.println("Cоздать новую таблицу");
             ArrayList<Employee> arrayEmployees = new ArrayList<Employee>();
-            CheckBoxEmployeesTable table = (CheckBoxEmployeesTable)scrollTable.getViewport().getView();
-            CheckBoxEmployeesTableModel tableModel = (CheckBoxEmployeesTableModel)table.getModel();
+            TableEmployees table = (TableEmployees)scrollTable.getViewport().getView();
+            EmployeeTableModel tableModel = (EmployeeTableModel)table.getModel();
             for(int i = 0;i<table.getRowCount();i++)
             {
-                if(tableModel.ArrayBooleans.get(i))
+                if(tableModel.getArrayBooleans().get(i))
                 {
-                    arrayEmployees.add(tableModel.employees.get(i));
+                    arrayEmployees.add(tableModel.getEmployees().get(i));
                 }
             }
 
@@ -176,7 +178,7 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
                 workingHourTextField.setBorder(BorderFactory.createLineBorder(new Color(245, 117, 69),2));
             } else {
                 date.set(Integer.parseInt(yearTextField.getText()), monthComboBox.getSelectedIndex(), 1); //настраиваем дату
-                workingHour = Double.parseDouble(workingHourTextField.getText());//получаем количество часов
+                workingHour = Double.valueOf(workingHourTextField.getText());//получаем количество часов
                 MainTable newTable = new MainTable(arrayEmployees, date, workingHour);// создаем на основе выще указанных данных объект класса MainTable
                 JScrollPane newScrollTable = new JScrollPane(new MainJTable(new ScheduleTableModel(newTable))); //запаковываем MaibTable в модель, модель таблицы в MainJTable, а потом в JScrollPane! ГОТОВО!
                 ((Schedule)this.getParent()).addScrollTable(newScrollTable);
@@ -199,151 +201,6 @@ public class CreationNewTableDialog extends JDialog implements ActionListener, K
 
     @Override
     public void keyReleased(KeyEvent e) {
-    }
-
-}
-
-class CheckBoxEmployeesTable extends JTable {
-
-    static final Font FONT = new Font("Verdena", Font.PLAIN, 14);
-
-    public CheckBoxEmployeesTable(ArrayList<Employee> employees) {
-        super(new CheckBoxEmployeesTableModel(employees));
-        this.setFont(FONT);
-        this.getColumnModel().getColumn(0).setPreferredWidth(80);
-        this.getColumnModel().getColumn(1).setPreferredWidth(30);
-        this.getColumnModel().getColumn(2).setPreferredWidth(10);
-        this.getColumnModel().getColumn(3).setPreferredWidth(10);
-        this.setRowHeight(25);
-        this.setBackground(new Color(252, 252, 217));
-    }
-    public void chekBoxfilter(String postOrDepartment, boolean value)
-    {
-        ArrayList<Employee> employees =((CheckBoxEmployeesTableModel)this.getModel()).getEmployees();
-        ArrayList<Boolean> ArrayBooleans = ((CheckBoxEmployeesTableModel)this.getModel()).getArrayBooleans();
-        
-        Byte index = indexOfArray(postOrDepartment, Employee.POSTS);
-        if (index != (-1)||postOrDepartment.equals("Все")) {
-            for (int i = 0; i < employees.size(); i++) {
-                if (employees.get(i).getPost().equals(index)) {
-                    ArrayBooleans.set(i, value);
-                }
-                if (postOrDepartment.equals("Все")) {
-                    ArrayBooleans.set(i, value);
-                }
-            }
-        }
-        index = indexOfArray(postOrDepartment, Employee.DEPARTMENTS);
-        if (index != (-1)||postOrDepartment.equals("Все")) {
-            for (int i = 0; i < employees.size(); i++) {
-                if (employees.get(i).getDepartment().equals(index)) {
-                    ArrayBooleans.set(i, value);
-                }
-                if (postOrDepartment.equals("Все")) {
-                    ArrayBooleans.set(i, value);
-                }
-            }
-        }
-    }
-    private Byte indexOfArray(String postOrDepartment, String[] array) {
-        for (Byte i = 0; i < array.length; i++) {
-            if (postOrDepartment.equals(array[i.intValue()])) {
-                return i;
-            }
-        }
-        return -1;
-    }
-}
-
-class CheckBoxEmployeesTableModel extends AbstractTableModel //модель таблицы с двумя колонками
-{
-
-    ArrayList<Employee> employees;
-    ArrayList<Boolean> ArrayBooleans = new ArrayList<Boolean>();
-
-    CheckBoxEmployeesTableModel(ArrayList<Employee> employees) {
-        this.employees = employees;
-        for (var e : employees) {
-            this.ArrayBooleans.add(Boolean.TRUE);
-        }
-    }
-
-    public ArrayList<Boolean> getArrayBooleans() {
-        return ArrayBooleans;
-    }
-
-    public ArrayList<Employee> getEmployees() {
-        return employees;
-    }
-    @Override
-    public String getColumnName(int column) {
-        String ret = "";
-        switch (column) {
-            case 0 ->
-                ret = "ФИО";
-            case 1 ->
-                ret = "Должность";
-            case 2 ->
-                ret = "Отделение";
-            case 3 ->
-                ret = "Добавление";
-
-        }
-        return ret;
-    }
-
-    @Override
-    public Class<?> getColumnClass(int columnIndex) {
-        Class<?> ret = Object.class;
-        switch (columnIndex) {
-            case 0, 1, 2 ->
-                ret = String.class;
-            case 3 ->
-                ret = Boolean.class;
-
-        }
-        return ret;
-    }
-
-    @Override
-    public int getRowCount() {
-        return employees.size();
-    }
-
-    @Override
-    public int getColumnCount() {
-        return 4;
-    }
-
-    @Override
-    public boolean isCellEditable(int rowIndex, int columnIndex) {//можно галочки ставить только в колонке с чекбоксами
-        return columnIndex == 3;
-    }
-
-    @Override
-    public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-        if (columnIndex == 3) {
-            ArrayBooleans.set(rowIndex, (Boolean) aValue);
-        }
-    }
-
-    @Override
-    public Object getValueAt(int rowIndex, int columnIndex) {//Возвращаем строки, если это первые 3 колонки,а четвертой колонкой будет чекбокс
-        if (columnIndex < 3) {
-            Employee emp = employees.get(rowIndex);
-            String ret = "";
-            switch (columnIndex) {
-                case 0 ->
-                    ret = emp.getSurname() + " " + emp.getName().substring(0, 1) + ". " + emp.getPatronomic().substring(0, 1) + '.';
-                case 1 ->
-                    ret = Employee.POSTS[emp.getPost()];
-                case 2 ->
-                    ret = Employee.DEPARTMENTS[emp.getDepartment()].startsWith("Лечебное") ? Employee.DEPARTMENTS[emp.getDepartment()].substring(19) : Employee.DEPARTMENTS[emp.getPost()];
-            }
-            return ret;
-        } else {
-            return ArrayBooleans.get(rowIndex);
-        }
     }
 
 }

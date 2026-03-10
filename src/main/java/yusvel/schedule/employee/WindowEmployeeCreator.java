@@ -35,7 +35,7 @@ public class WindowEmployeeCreator  {
     int w =350;
     int h = 340;
     
-    WindowEmployeeCreator()
+    public WindowEmployeeCreator()
     {
         System.out.println("Constructor WindowEmployeeCreator");
         mainFraim = new JDialog();
@@ -46,10 +46,10 @@ public class WindowEmployeeCreator  {
         workingShiftList = new JComboBox(new String[]{"ВЕЧЕР(15:00-21:00)","УТРО(8:00-14:00)"});
         
         cabinetNumberLabel = new JLabel("№ Кабинета:  ",JLabel.RIGHT);
-        cabinetNumberList = new JComboBox(new Byte[]{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16});
+        cabinetNumberList = new JComboBox(Employee.CABINET_NUMBER);
         departmentList = new JComboBox(Employee.DEPARTMENTS);
         departmentLabel = new JLabel("Отделение:  ",JLabel.RIGHT);
-        workingRateList = new JComboBox(new Float[]{1.0f,0.75f,0.5f,0.25f});
+        workingRateList = new JComboBox(Employee.WORKING_RATE);
         workingRateLabel = new JLabel("Ставка:  ",JLabel.RIGHT);
         postList = new JComboBox(Employee.POSTS);
         postLabel = new JLabel("Должность:  ",JLabel.RIGHT);
@@ -153,8 +153,8 @@ public class WindowEmployeeCreator  {
                                         employee.setPatronomic(patronomicTextField.getText());
                                         employee.setBithDay(bithPiker.getDate());
                                         employee.setPost((byte)postList.getSelectedIndex());
-                                        employee.setWorkingRate((Float)workingRateList.getSelectedItem());
-                                        employee.setCabinetNumber((Byte)cabinetNumberList.getSelectedItem());
+                                        employee.setWorkingRate((byte)workingRateList.getSelectedIndex());
+                                        employee.setCabinetNumber((byte)cabinetNumberList.getSelectedItem());
                                         employee.setDepartment((byte)departmentList.getSelectedIndex());
                                         employee.setBeginEmployment(Calendar.getInstance());
                                         employee.setWorkingShift(workingShiftList.getSelectedIndex()!=0);
@@ -194,7 +194,7 @@ public class WindowEmployeeCreator  {
         patronomicTextField.setText(employeeNeedToChanged.patronomic);
         bithPiker.setDate(employeeNeedToChanged.bithDay);
         postList.setSelectedIndex(employeeNeedToChanged.getPost());
-        workingRateList.setSelectedItem(employeeNeedToChanged.getWorkingRate());
+        workingRateList.setSelectedIndex(employeeNeedToChanged.getWorkingRate());
         cabinetNumberList.setSelectedIndex(employeeNeedToChanged.getCabineNumber()-1);
         departmentList.setSelectedIndex(employeeNeedToChanged.getDepartment());
         

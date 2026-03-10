@@ -72,18 +72,6 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
         this.addMouseListener(this);
         this.addKeyListener(this);
         CellEditor editor = this.getDefaultEditor(Designations.class);
-        editor.addCellEditorListener(new CellEditorListener() {
-            @Override
-            public void editingStopped(ChangeEvent e) {
-                System.out.println(((CellEditor) e.getSource()).getCellEditorValue().toString());
-            }
-
-            @Override
-            public void editingCanceled(ChangeEvent e) {
-                System.out.println("Редактирование отменено");
-            }
-        });
-
         this.setModel(tableModel);
         if (this.getColumnCount() > 5) {
             this.getColumnModel().getColumn(0).setPreferredWidth(30);
@@ -108,7 +96,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
                 }
                 beginSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
                 endSelectedRow = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
-                System.out.println("Вы выделили СТРОКУ c №: " + beginSelectedRow + " по № " + endSelectedRow);
+                //System.out.println("Вы выделили СТРОКУ c №: " + beginSelectedRow + " по № " + endSelectedRow);
 
             
         
@@ -123,39 +111,30 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
                 }
                 beginSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMinSelectionIndex();
                 endSelectedColumn = ((DefaultListSelectionModel) e.getSource()).getMaxSelectionIndex();
-                System.out.println("Вы выделили СТОЛБЕЦ c №: " + beginSelectedColumn + " по № " + endSelectedColumn);
-
-            
-        
-        ///TODO
-                                                                                            }
-                                                                                    });
-    
+                //System.out.println("Вы выделили СТОЛБЕЦ c №: " + beginSelectedColumn + " по № " + endSelectedColumn);
+            }
+        });
     }
 
     @Override
     public void mouseClicked(MouseEvent e) { //левая кнопка мыши
         clickedColumnByMousebutton3 = this.columnAtPoint(new Point(e.getX(), e.getY()));
         clickedRowByMousebutton3 = this.rowAtPoint(new Point(e.getX(), e.getY()));
-        System.out.println("Point(" + clickedRowByMousebutton3 + ", " + clickedColumnByMousebutton3 + ")");
+        //System.out.println("Point(" + clickedRowByMousebutton3 + ", " + clickedColumnByMousebutton3 + ")");
         if (this.getSelectedColumn() > 1 && e.getButton() == 3 && clickedColumnByMousebutton3 >= 2 && clickedRowByMousebutton3 >= 0) {
 
             popup.show(this, e.getX() + 1, e.getY() + 1);
         }
     }
-
     @Override
     public void mousePressed(MouseEvent e) {
     }
-
     @Override
     public void mouseReleased(MouseEvent e) {
     }
-
     @Override
     public void mouseEntered(MouseEvent e) {
     }
-
     @Override
     public void mouseExited(MouseEvent e) {
     }
@@ -205,13 +184,12 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
 
                                 cPaste++;
                             }
-
                         }
                         cPaste = clickedColumnByMousebutton3;
                         rPaste++;
                     }
+                    this.getDefaultEditor(Designations.class).stopCellEditing();//Явно вызываем функцию stopCellEditing для того, чтобы передать всем слушателям, о том, что произошли изменения в таблице
                     this.repaint();
-
                     break;
                 default:
                     for (int c = beginSelectedColumn; c <= endSelectedColumn && c >= 2; c++) {
@@ -219,6 +197,7 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
                             this.setValueAt(new Designations(((MenuItem) e.getSource()).getLabel()), r, c);
                         }
                     }
+                    this.getDefaultEditor(Designations.class).stopCellEditing(); //Явно вызываем функцию stopCellEditing для того, чтобы передать всем слушателям, о том, что произошли изменения в таблице
                     this.repaint();
                     break;
             }
@@ -228,50 +207,51 @@ public class MainJTable extends JTable implements MouseListener, ActionListener,
 
     @Override
     public void keyTyped(KeyEvent e) {
-        if (this.getSelectedColumn() >= 2 && !e.isControlDown())//если без CTL
+        int row = this.getSelectedRow();
+        int col = this.getSelectedColumn();
+        if (!e.isControlDown() && e.getSource() == this && row >= 0 && col > 1)//если без CTL
         {
             switch (e.getKeyChar()) {
-                case 'у':;
-                case 'E':;
-                case 'e':;
-                case 'У':
-                    this.setValueAt(new Designations("У"), this.getSelectedRow(), this.getSelectedColumn());
-                    break;
-                case 'B':;
-                case 'b':;
-                case 'В':;
-                case 'в':
-                    this.setValueAt(new Designations("В"), this.getSelectedRow(), this.getSelectedColumn());
-                    ;
-                    break;
-                default:;
-                    break;
-            }
-        }
-        if (this.getSelectedColumn() >= 2 && e.isAltDown()) //с CTRL
-        {
-            switch (e.getKeyChar()) {
-                case 'у':;
-                case 'E':;
-                case 'e':;
-                case 'У':
-                    this.setValueAt(new Designations("Уд"), this.getSelectedRow(), this.getSelectedColumn());
-                    break;
-                case 'В':;
-                case 'B':;
-                case 'b':;
-                case 'в':
-                    this.setValueAt(new Designations("Вд"), this.getSelectedRow(), this.getSelectedColumn());
-                    break;
-                default:;
-                    break;
-            }
-        }
-        if (this.getSelectedColumn() >= 2 && e.getKeyChar() == KeyEvent.VK_DELETE) {
-            this.setValueAt(new Designations(" "), this.getSelectedRow(), this.getSelectedColumn());
-        }
+                case 'у', 'E', 'e', 'У' -> {
+                    this.setValueAt(new Designations("У"), row, col);
+                    ((DesignationCellEditor) this.getDefaultEditor(Designations.class)).setText("У"); //ставим текст в редакторе
+                    this.getDefaultEditor(Designations.class).stopCellEditing();
+                }
+                case 'B', 'd', 'D', 'в' -> {
+                    this.setValueAt(new Designations("В"), row, col);
+                    ((DesignationCellEditor) this.getDefaultEditor(Designations.class)).setText("В"); //ставим текст в редакторе
+                    this.getDefaultEditor(Designations.class).stopCellEditing();
+                }
+                default -> {
 
-        this.repaint();
+                }
+            }
+            ((ScheduleTableModel) this.getModel()).fireTableDataChanged();
+        }
+        if (e.isAltDown() && e.getSource() == this && row >= 0 && col > 1) //с CTRL
+        {
+            switch (e.getKeyChar()) {
+                case 'у', 'E', 'e', 'У' -> {
+                    this.setValueAt(new Designations("Уд"), row, col);
+                    ((DesignationCellEditor) this.getDefaultEditor(Designations.class)).setText("Уд"); //ставим текст в редакторе
+                    this.getDefaultEditor(Designations.class).stopCellEditing();
+                }
+                case 'В', 'D', 'd', 'в' -> {
+                    this.setValueAt(new Designations("Вд"), row, col);
+                    ((DesignationCellEditor) this.getDefaultEditor(Designations.class)).setText("Вд"); //ставим текст в редакторе
+                    this.getDefaultEditor(Designations.class).stopCellEditing();
+                }
+                default -> {
+
+                }
+            }
+            ((ScheduleTableModel) this.getModel()).fireTableDataChanged();
+        }
+        if (e.getKeyChar() == KeyEvent.VK_DELETE && e.getSource() == this && row >= 0 && col > 1) {
+            this.setValueAt(new Designations(""), row, col);
+            ((DesignationCellEditor) this.getDefaultEditor(Designations.class)).setText(""); //ставим текст в редакторе
+            this.getDefaultEditor(Designations.class).stopCellEditing();
+        }
     }
 
     @Override

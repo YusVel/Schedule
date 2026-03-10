@@ -13,58 +13,35 @@ import java.util.EventObject;
 import java.util.List;
 import javax.swing.*;
 import java.awt.MenuItem;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.CellEditorListener;
 import javax.swing.table.TableCellEditor;
 import org.jdesktop.swingx.JXTextField;
 
-public class DesignationCellEditor extends JXTextField implements TableCellEditor {
+public class DesignationCellEditor extends JXTextField implements TableCellEditor,ActionListener,MouseListener, KeyListener {
 
     List designationCellEditorLiseners = new ArrayList(); //так как данный редакор генерирует события отмена редактирование и конец редактирования то мы должы регестрировать слушателей, которые будут реагировать на синалы от редактора.
     private ChangeEvent event = new ChangeEvent(this);
     static PopupMenu popup = new PopupMenu();
+    Designations previousStateCell;
+    int col;
+    int row;
     DesignationCellEditor() {
         for(String el:Designations.ACCEPTABLE)
         {
             MenuItem menu = new MenuItem(el);
-            menu.addActionListener(new ActionListener() {
-                                                        @Override
-                                                        public void actionPerformed(ActionEvent e) {
-                                                             ((DesignationCellEditor)popup.getParent()).setText(((MenuItem)e.getSource()).getLabel());
-                                                             ((DesignationCellEditor)popup.getParent()).stopCellEditing();
-                                                        }
-                                                    });
+            menu.addActionListener(this);
             popup.add(menu);
         }
+        popup.addActionListener(this);
         this.add(popup);
         this.setToolTipText(Designations.getAcceptables());
-        this.addActionListener(new ActionListener() {
-                                                        @Override
-                                                        public void actionPerformed(ActionEvent e) {
-                                                            stopCellEditing();
-                                                        }
-                                                    });
-        this.addMouseListener(new MouseListener(){
-                                                    @Override
-                                                    public void mouseClicked(MouseEvent e) {
-                                                          
-                                                        if(e.getButton()==MouseEvent.BUTTON3)
-                                                        {
-                                                             popup.show((DesignationCellEditor)e.getSource(), 0, 0);
-                                                         
-                                                        }
-                                                    }
-                                                    @Override
-                                                    public void mousePressed(MouseEvent e) {}
-                                                    @Override
-                                                    public void mouseReleased(MouseEvent e) {}
-                                                    @Override
-                                                    public void mouseEntered(MouseEvent e) {}
-                                                    @Override
-                                                    public void mouseExited(MouseEvent e) {}
-                                                });
+        this.addActionListener(this);
+        this.addMouseListener(this);
+        this.addKeyListener(this);
     }
-
     @Override
     public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) { //возвращаем значение Text в редактор JTextField
         this.setBackground(new Color(222, 255, 223));
@@ -79,8 +56,17 @@ public class DesignationCellEditor extends JXTextField implements TableCellEdito
 
     @Override
     public boolean isCellEditable(EventObject anEvent) {
-        //ячейка редактируется если кликов больше 1
-        return anEvent.getClass().equals(MouseEvent.class) && ((MouseEvent) anEvent).getClickCount() > 1;
+        if (anEvent.getSource() instanceof JTable table && table instanceof MainJTable mainJTable) {
+            row = mainJTable.getSelectedRow();
+            col = mainJTable.getSelectedColumn();
+            if (row >= 0 && col > 1) {
+                previousStateCell = (Designations) mainJTable.getValueAt(row, col);
+               // System.out.println("Прежнее значение ячейки (" + row + "," + col + ") = " + previousStateCell);
+            }
+
+        }
+       // previousStateCell = 
+        return anEvent.getClass().equals(MouseEvent.class)&&((MouseEvent)anEvent).getClickCount()>1;
     }
 
     @Override
@@ -92,13 +78,20 @@ public class DesignationCellEditor extends JXTextField implements TableCellEdito
     public boolean stopCellEditing() {
         Designations s;
         try {
+            // System.out.println("Проверяем: "+this.getText());
             s = new Designations(this.getText());
-            for (int i = 0; i < designationCellEditorLiseners.size(); i++) {
-                ((CellEditorListener) designationCellEditorLiseners.get(i)).editingStopped(event);
+            if (!previousStateCell.equals(s)) {
+                for (int i = 0; i < designationCellEditorLiseners.size(); i++) {
+                    ((CellEditorListener) designationCellEditorLiseners.get(i)).editingStopped(event);
+                }
+            }
+            else
+            {
+                System.out.println("Измененное значение ячейки такое же!");
             }
         } catch (IllegalArgumentException e) {
             this.requestFocus();
-            JOptionPane.showMessageDialog(null, "Допустимые значения в ячейке: "+Designations.getAcceptables());
+            JOptionPane.showMessageDialog(null, "Допустимые значения в ячейке: " + Designations.getAcceptables());
             return false;
         }
         return true;
@@ -119,6 +112,76 @@ public class DesignationCellEditor extends JXTextField implements TableCellEdito
     @Override
     public void removeCellEditorListener(CellEditorListener l) {
         designationCellEditorLiseners.remove(l);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource().getClass().equals(MenuItem.class)) {
+            //System.out.println("actionPerformed MenuItem: "+this.getText());
+            this.setText(((MenuItem) e.getSource()).getLabel());
+        }
+            stopCellEditing();
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        if (e.getSource()==this) {
+            popup.show(this, 0, 0);
+        }    
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {}
+
+    @Override
+    public void mouseReleased(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
+    @Override
+    public void keyReleased(KeyEvent e) {}
+
+    @Override
+    public void keyPressed(KeyEvent e) {}
+
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (!e.isControlDown()&&e.getSource()==this)//если без CTL
+        {
+            switch (e.getKeyChar()) {
+                case 'у', 'E', 'e', 'У' -> {
+                    this.setText("У"); stopCellEditing();
+                }
+                case 'B', 'd', 'D', 'в' -> {
+                    this.setText("В"); stopCellEditing();
+                  
+                }
+                default -> {
+                    
+                }
+            }
+        }
+        if (e.isAltDown()&&e.getSource()==this) //с CTRL
+        {
+            switch (e.getKeyChar()) {
+                case 'у', 'E', 'e', 'У' -> {
+                    this.setText("Уд"); stopCellEditing();
+                }
+                case 'В', 'D', 'd', 'в' -> {
+                    this.setText("Вд"); stopCellEditing();
+                }
+                default -> {
+                    
+                }
+            }
+        }
+        if (e.getKeyChar() == KeyEvent.VK_DELETE&&e.getSource()==this) {
+            this.setText(" "); stopCellEditing();
+        }
     }
 
 }

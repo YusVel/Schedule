@@ -67,7 +67,7 @@ class Human implements Serializable
 
 public class Employee extends Human implements Comparable<Employee>, Serializable// Класс работник
 {
-    private Float workingRate;
+    private Byte workingRate;
     private Byte post;
     private Byte department;
     private Calendar beginEmployment;
@@ -79,7 +79,7 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
      Employee()
     {
        super("Surname","Name","Patronomic",Calendar.getInstance());
-       workingRate = 1.0f;
+       workingRate = 3;
        post = 0;
        department = 0;
        beginEmployment = Calendar.getInstance();
@@ -141,6 +141,19 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
             "Детское отделение",
             "Вспомог. персонал"
         };
+    public static Float[]  WORKING_RATE = new Float[] // *****!!!!!не стоит менять порядок строк в массиве))*****!!!!!
+    {
+       0.25f,
+       0.5f,
+       0.75f,
+       1.0f,
+       1.25f,
+       1.5f
+    };
+     public static Byte[]  CABINET_NUMBER = new Byte[] // *****!!!!!не стоит менять порядок строк в массиве))*****!!!!!
+    {
+       1,2,3,4,5,6,7,8,9,10,11,12,13,14,15
+    };
     ////////////////////////Создание  и изменение сотрудника через модальное окно JDialog/////////
     static public Employee create()
     {
@@ -166,7 +179,7 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
     {
         this.bithDay = bithDay;
     }
-    public void setWorkingRate(Float workingRate)
+    public void setWorkingRate(Byte workingRate)
     {
         this.workingRate = workingRate;
     }
@@ -211,7 +224,7 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
         return String.format("%s %s %s ", surname,name,patronomic);
     }
     public Byte getPost(){return post;}
-    public Float getWorkingRate(){return workingRate;}
+    public Byte getWorkingRate(){return workingRate;}
     public Byte getDepartment(){return department;}
     public Byte getCabineNumber(){return cabinetNumber;}
     public Calendar getBeginEmployment(){return beginEmployment;}
@@ -221,40 +234,41 @@ public class Employee extends Human implements Comparable<Employee>, Serializabl
   
     /// @throws java.io.FileNotFoundException
     /// @throws java.lang.ClassNotFoundException
-    public static ArrayList<Employee> readFromFile() throws FileNotFoundException, IOException, ClassNotFoundException
+    public static ArrayList<Employee> readFromFile(String fileName) throws FileNotFoundException, IOException, ClassNotFoundException
     {
         ArrayList<Employee> result = new ArrayList<>();
         try
         {
-            File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
-            if(!file.exists()){throw new FileNotFoundException("Файл для чтения отсутствует");}
+            File file = new File(fileName);
+            if(!file.exists()){throw new FileNotFoundException("Файл "+fileName+" отсутствует. Загружается пустой список! ");}
             try(FileInputStream fin = new FileInputStream(file); ObjectInputStream oifin = new ObjectInputStream(fin))
                 {
                     result = (ArrayList<Employee>)oifin.readObject();  
                 }
         }
-        catch(FileNotFoundException e)
-        {
-            System.out.println(e.getMessage()+"исключение при чтении FileNotFoundException");
-        }
         catch(IOException e)
         {
-            System.out.println(e.getMessage()+ "исключение при чтении IOException");
+            System.out.println(e.getMessage()+ "Исключение при чтении IOException");
+            return null;
         }
         
         return result;
     }
     
     
-    public static void writeToFile(ArrayList<Employee> arr) throws FileNotFoundException, IOException
+    public static void writeToFile(ArrayList<Employee> arr, String fileName) throws FileNotFoundException
     {
 
-         File file = new File(Paths.get("").toAbsolutePath().toString(),fileName);
+         File file = new File(fileName);
          file.setReadable(true);
          file.setWritable(true);
          if(!file.exists()) //создаем файл для записи данных, если он не существует
          {
-             file.createNewFile();
+             try {
+                 file.createNewFile();
+             } catch (IOException ex) {
+                 System.out.println("Error! Creation new file faild: "+ ex);
+             }
              System.out.println("CREATED new file: "+file.getPath());
          }
         try( ObjectOutputStream oOut = new ObjectOutputStream(new FileOutputStream(file)))

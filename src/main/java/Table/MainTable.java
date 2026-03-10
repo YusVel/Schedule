@@ -16,145 +16,221 @@ import java.io.Serializable;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Comparator;
 import yusvel.schedule.employee.Employee;
 
+public class MainTable implements Serializable ,Cloneable{
 
-public class MainTable implements Serializable{
     private ArrayList<Employee> arrEmployees;
     private Calendar date;
     private Double workingHoursPerMonth;
     private String fileName;
-    public MainTable(){}
-    public MainTable(ArrayList<Employee> arrEmployees,Calendar date, Double workingHoursPerMonth)
-    {
-        if(arrEmployees==null||date==null||workingHoursPerMonth==null||workingHoursPerMonth<0.0)
-        {
-            if(arrEmployees==null){
+
+    public MainTable() {
+    }
+
+    public MainTable(ArrayList<Employee> arrEmployees, Calendar date, Double workingHoursPerMonth) {
+        if (arrEmployees == null || date == null || workingHoursPerMonth == null || workingHoursPerMonth < 0.0) {
+            if (arrEmployees == null) {
                 throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(ArrayList<Employee>==NULL ...)");
             }
-            if(date==null){
+            if (date == null) {
                 throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(...,Calendar date == NULL, ...)");
-            } 
-            if(workingHoursPerMonth==null||workingHoursPerMonth<0.0){
+            }
+            if (workingHoursPerMonth == null || workingHoursPerMonth < 0.0) {
                 throw new IllegalArgumentException("В конструкторе недопустимый аргумент: MainTable(..., Double workingHoursPerMonth==NULL or < 0.0)");
             }
         }
         this.arrEmployees = arrEmployees;
         this.date = date;
         this.workingHoursPerMonth = workingHoursPerMonth;
-        if(arrEmployees.isEmpty())
-        {
+        if (arrEmployees.isEmpty()) {
             System.out.println("Load empty arrayList<Emplyee>");
-            /////ToDo/////
+        
+        /////ToDo/////
         }
         
-        fileName = "Schedue_of_"+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+"_"+date.get(Calendar.YEAR)+".tbl";
-        
-        System.out.println("График на "+DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)]+" "+date.get(Calendar.YEAR)+"год "+ workingHoursPerMonth +" ч. Будет охранен в "+fileName);
-        for(Employee e: arrEmployees) //инициализируем поле ArrayList<Designations> workSchedule 
+        fileName = "Schedue_of_" + DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)] + "_" + date.get(Calendar.YEAR) + ".tbl";
+
+        System.out.println("График на " + DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)] + " " + date.get(Calendar.YEAR) + "год " + workingHoursPerMonth + " ч. Будет охранен в " + fileName);
+        for (Employee e : arrEmployees) //инициализируем поле ArrayList<Designations> workSchedule 
         {
-            if(e.getWorkSchedule()==null||e.getWorkSchedule().size()!=date.getActualMaximum(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
+            if (e.getWorkSchedule() == null || e.getWorkSchedule().size() != date.getActualMaximum(Calendar.DAY_OF_MONTH))//если данное поле не инициализировано или оно не соотверствует по размеру текущей дате (излишние проверки?)
             {
                 e.setWorkSchedule(new ArrayList<Designations>(date.getActualMaximum(Calendar.DAY_OF_MONTH)));
             }
         }
         genereteDesignationsForAllEmployees();
     }
+
     ////////////////метод авогенерации массива с обозначениями ArraList<Designations> у всех сотрудников///////////////////////////////
      
-    private void genereteDesignationsForAllEmployees()
-    {
+    private void genereteDesignationsForAllEmployees() {
         Calendar firstDayMonthofWeek = Calendar.getInstance();
-        firstDayMonthofWeek.set(date.get(Calendar.YEAR),date.get(Calendar.MONTH),1); //первый день текущего месяца
-        
-        for(Employee e:arrEmployees)//проходим по массиву сотрудников
+        firstDayMonthofWeek.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), 1); //первый день текущего месяца
+
+        for (Employee e : arrEmployees)//проходим по массиву сотрудников
         {
             int weekDay = firstDayMonthofWeek.get(Calendar.DAY_OF_WEEK);//определяем день недели первого дня месяца
-            for(int i =0;i<date.getActualMaximum(Calendar.DAY_OF_MONTH);i++)//у каждого сотрудника инициализируем массив с графиком работы(обозначений)
+            for (int i = 0; i < date.getActualMaximum(Calendar.DAY_OF_MONTH); i++)//у каждого сотрудника инициализируем массив с графиком работы(обозначений)
             {
                 int val = 0;
                 Boolean cond = false;
-                weekDay%=7;
-                if(weekDay==0||weekDay==1){val=0;}//если  выходной день, то оставляем пустую ячейку Designation
-                else if(e.getWorkingShift()==true&&i%2==1){val=1;cond=true;} //если смена у доктора нечетная и число нечетное то "У"
-                else if(e.getWorkingShift()==true&&i%2==0){val=2;cond=true;}//если смена у доктора нечетная и число четное то "В"
-                else if(e.getWorkingShift()==false&&i%2==1){val=2;cond=true;} //если смена у доктора нечетная и число нечетное то "В"
-                else if(e.getWorkingShift()==false&&i%2==0){val=1;cond=true;}//если смена у доктора нечетная и число четное то "У"
-                e.getWorkSchedule().add(new Designations(val,cond));
-                weekDay++; 
+                weekDay %= 7;
+                if (weekDay == 0 || weekDay == 1) {
+                    val = 0;
+                }//если  выходной день, то оставляем пустую ячейку Designation
+                else if (e.getWorkingShift() == true && i % 2 == 1) {
+                    val = 1;
+                    cond = true;
+                } //если смена у доктора нечетная и число нечетное то "У"
+                else if (e.getWorkingShift() == true && i % 2 == 0) {
+                    val = 2;
+                    cond = true;
+                }//если смена у доктора нечетная и число четное то "В"
+                else if (e.getWorkingShift() == false && i % 2 == 1) {
+                    val = 2;
+                    cond = true;
+                } //если смена у доктора нечетная и число нечетное то "В"
+                else if (e.getWorkingShift() == false && i % 2 == 0) {
+                    val = 1;
+                    cond = true;
+                }//если смена у доктора нечетная и число четное то "У"
+                e.getWorkSchedule().add(new Designations(val, cond));
+                weekDay++;
             }
         }
     }
-    
+
+    ////////////////////метод авогенерации массива с обозначениями ArraList<Designations>  для ОДНОГО сотрудников/////////////////////////
+    private void genereteDesignations(Employee e) {
+        e.setWorkSchedule(new ArrayList<Designations>());
+        Calendar firstDayMonthofWeek = Calendar.getInstance();
+        firstDayMonthofWeek.set(date.get(Calendar.YEAR), date.get(Calendar.MONTH), 1); //первый день текущего месяца
+        int weekDay = firstDayMonthofWeek.get(Calendar.DAY_OF_WEEK);//определяем день недели первого дня месяца
+        for (int i = 0; i < date.getActualMaximum(Calendar.DAY_OF_MONTH); i++)//у каждого сотрудника инициализируем массив с графиком работы(обозначений)
+        {
+            int val = 0;
+            Boolean cond = false;
+            weekDay %= 7;
+            if (weekDay == 0 || weekDay == 1) {
+                val = 0;
+            }//если  выходной день, то оставляем пустую ячейку Designation
+            else if (e.getWorkingShift() == true && i % 2 == 1) {
+                val = 1;
+                cond = true;
+            } //если смена у доктора нечетная и число нечетное то "У"
+            else if (e.getWorkingShift() == true && i % 2 == 0) {
+                val = 2;
+                cond = true;
+            }//если смена у доктора нечетная и число четное то "В"
+            else if (e.getWorkingShift() == false && i % 2 == 1) {
+                val = 2;
+                cond = true;
+            } //если смена у доктора нечетная и число нечетное то "В"
+            else if (e.getWorkingShift() == false && i % 2 == 0) {
+                val = 1;
+                cond = true;
+            }//если смена у доктора нечетная и число четное то "У"
+            e.getWorkSchedule().add(new Designations(val, cond));
+            weekDay++;
+        }
+    }
     //Инициализация массива с обозначениями ArraList<Designations> для одного сотрудника//
-    
+
     /////////////////////////Геттеры////////////////////////////////////
-    public ArrayList<Employee> getEmployees(){return arrEmployees;}
-    public Calendar getDate(){return date;};
-    public Double getWorkingHours(){return workingHoursPerMonth;}
+    public ArrayList<Employee> getEmployees() {
+        return arrEmployees;
+    }
+
+    public Calendar getDate() {
+        return date;
+    }
+
+    ;
+    public Double getWorkingHours() {
+        return workingHoursPerMonth;
+    }
+
     public String getShortFileNameToSave() {
         return fileName;
     }
+
     //////////////////////////Сеттеры////////////////////////////////
-    public void setArrEmployees(ArrayList<Employee> arrEmployees)
-    {
-        if(arrEmployees==null){
-                throw new IllegalArgumentException("В методе недопустимый аргумент: setArrEmployees(ArrayList<Employee> arrEmployees==NULL )");}
+    public void setArrEmployees(ArrayList<Employee> arrEmployees) {
+        if (arrEmployees == null) {
+            throw new IllegalArgumentException("В методе недопустимый аргумент: setArrEmployees(ArrayList<Employee> arrEmployees==NULL )");
+        }
         this.arrEmployees = arrEmployees;
     }
-    public void setWorkingHoursPerMonth(Double workingHoursPerMonth)
-    {
-        if(workingHoursPerMonth==null||workingHoursPerMonth<0.0){
-                throw new IllegalArgumentException("В методе недопустимый аргумент: setWorkingHoursPerMonth(Double workingHoursPerMonth==NULL or < 0.0)"); }
+
+    public void setWorkingHoursPerMonth(Double workingHoursPerMonth) {
+        if (workingHoursPerMonth == null || workingHoursPerMonth < 0.0) {
+            throw new IllegalArgumentException("В методе недопустимый аргумент: setWorkingHoursPerMonth(Double workingHoursPerMonth==NULL or < 0.0)");
+        }
         this.workingHoursPerMonth = workingHoursPerMonth;
     }
-    
-    
-    
-    public void writeTableToFile(String fullPath) throws FileNotFoundException
-    {
-         File file = new File(fullPath);
-         file.setReadable(true);
-         file.setWritable(true);
-        try(var ois = new ObjectOutputStream(new FileOutputStream(file));)
-        {
-         if(!file.exists()) //создаем файл для записи данных, если он не существует
-         {
-             file.createNewFile();
-             System.out.println("CREATED new file: "+file.getPath());
-         }
+
+    public void writeTableToFile(String fullPath) throws FileNotFoundException {
+        File file = new File(fullPath);
+        file.setReadable(true);
+        file.setWritable(true);
+        try (var ois = new ObjectOutputStream(new FileOutputStream(file));) {
+            if (!file.exists()) //создаем файл для записи данных, если он не существует
+            {
+                file.createNewFile();
+                System.out.println("CREATED new file: " + file.getPath());
+            }
             ois.writeObject(this);
-            System.out.println("Записываем: "+file.getPath());
-        }
-        catch(IOException e)
-        {
-            System.out.println("Не удалось записать таблицу в "+file.getPath()+"ErroR: "+e);
+            System.out.println("Записываем: " + file.getPath());
+        } catch (IOException e) {
+            System.out.println("Не удалось записать таблицу в " + file.getPath() + "ErroR: " + e);
         }
     }
-    public static MainTable readTableFromFile(String fullFileName)throws FileNotFoundException, IOException, ClassNotFoundException
-    {
-         File file = new File(fullFileName);
-         file.setReadable(true);
-         file.setWritable(true);
-         try(var ois = new ObjectInputStream(new FileInputStream(file));)
+
+    public static MainTable readTableFromFile(String fullFileName) throws FileNotFoundException, IOException, ClassNotFoundException {
+        File file = new File(fullFileName);
+        file.setReadable(true);
+        file.setWritable(true);
+        try (var ois = new ObjectInputStream(new FileInputStream(file));) {
+            if (!file.exists()) // он не существует?
             {
-                if(!file.exists()) // он не существует?
-                {
-                    throw new FileNotFoundException(fullFileName + " - данного файла нет.");  
-                }
-                System.out.println("Загружаем таблицу из "+file.getPath());
-                MainTable tmp = (MainTable)ois.readObject(); 
-                return tmp;
+                throw new FileNotFoundException(fullFileName + " - данного файла нет.");
             }
-         catch(IOException e)
-            {
-                System.out.println("Не удалось прочитать таблицу из "+file.getPath()+"ErroR:"+e);
-            }
-    return null;
+            System.out.println("Загружаем таблицу из " + file.getPath());
+            MainTable tmp = (MainTable) ois.readObject();
+            return tmp;
+        } catch (IOException e) {
+            System.out.println("Не удалось прочитать таблицу из " + file.getPath() + "ErroR:" + e);
+        }
+        return null;
     }
-   /* @Override
+
+    void addEmployee(Employee newOne) {
+        if (newOne != null) {
+            if (newOne.getWorkSchedule() == null) {
+                genereteDesignations(newOne);
+            }
+            arrEmployees.add(newOne);
+
+            arrEmployees.sort((Employee o1, Employee o2) -> o1.compareTo(o2));
+        } else {
+            throw new IllegalArgumentException("void addEmployee(Employee newOne==NULL)");
+        }
+    }
+
+    public void removeEmployee(int index) {
+        arrEmployees.remove(index);
+    }
+    /* @Override
     public String toString()
     {
         return String.format("[%s-%d] %d сотр. ", DatePicker.MONTHS_OF_YEAR[date.get(Calendar.MONTH)],date.get(Calendar.YEAR),arrEmployees.size());
     }*/
+    
+    @Override
+    public Object clone() 
+    {
+        return new MainTable((ArrayList<Employee>)arrEmployees.clone(),(Calendar)date.clone(),workingHoursPerMonth.doubleValue());
+    }
 }

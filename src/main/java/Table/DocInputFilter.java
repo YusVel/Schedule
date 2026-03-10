@@ -35,14 +35,14 @@ public class DocInputFilter extends DocumentFilter {//фильтр провер�
     @Override
     public void replace(DocumentFilter.FilterBypass fb, int offset, int length, String text, AttributeSet attrs) {
         if (isNumber(text) && signs < 2) {
-            System.out.println("Количество запятых: " + signs);
+           // System.out.println("Количество запятых: " + signs);
             try {
                 super.replace(fb, offset, length, text, attrs);
             } catch (BadLocationException ex) {
                 System.out.println(ex);
             }
         } else {
-            System.out.println("Удаляем ввод: " + text);
+            //System.out.println("Удаляем ввод: " + text);
             if (text.equals(",") || text.equals(".")) {
                 signs--;
             }
@@ -53,7 +53,7 @@ public class DocInputFilter extends DocumentFilter {//фильтр провер�
         if (text.equals(",") || text.equals(".")) {
             signs++;
         }
-        System.out.println("Введенное значение: " + text);
+       // System.out.println("Введенное значение: " + text);
         return text.matches(regEx) && signs < 2;
     }
 

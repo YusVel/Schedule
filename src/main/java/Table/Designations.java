@@ -10,7 +10,7 @@ import javax.swing.table.AbstractTableModel;
 
 
 public class Designations implements Serializable { // объекты обозначения в главной таблице с графиком работы (можно было и воспользоваться ENUM)
-    final static String[] ACCEPTABLE = {" ","У","В","У/В","Б", "Ух","Уд","Вд", "У7","ОТ"};// //все возможные состояния обозначения
+    final static String[] ACCEPTABLE = {"","У","В","У/В","Б", "Ух","Уд","Вд", "У7","ОТ"};// //все возможные состояния обозначения
     public static String getAcceptables(){return String.join(",", ACCEPTABLE);}
     private int value; //обозначение в графике У,В,У/В,Б и тд
     private Boolean condition = true; //Действительно ли выходил на работу
@@ -19,7 +19,7 @@ public class Designations implements Serializable { // объекты обозн
         int counter = 0;
         for(String v:ACCEPTABLE)
         {
-            if(v.equals(val)){
+            if(v.equals(val.trim())){
                 return counter;
             }
             counter++;
@@ -35,7 +35,16 @@ public class Designations implements Serializable { // объекты обозн
             throw new IllegalArgumentException("IllegalArgumentException: Аргумент, передаваемый конструктору Designation("+val+") не найден в массиве String[] ACCEPTABLE = {\"\",\"У\",\"В\",\"У/В\",\"Б\", \"Ух\", \"У7\",};");
         }
         value = index;
-        condition = true;
+        condition = getConditionDependingOfValue(val);
+    }
+    private boolean getConditionDependingOfValue(String val)
+    {
+        boolean ret = false;
+        switch(val)
+        {
+            case "У","В","У/В", "Ух","Уд","Вд", "У7" -> ret = true;
+        }
+        return ret;
     }
     public void setCondition(Boolean cond){condition = cond;} // 
     public void setValue(int val,Boolean cond)
@@ -46,4 +55,18 @@ public class Designations implements Serializable { // объекты обозн
     public int getValueInt(){return value;}
     @Override
     public String toString(){return ACCEPTABLE[value];}
+    @Override
+    public boolean equals(Object another)
+    {
+        return  another!=null
+                &&this.getClass().equals(another.getClass())
+                &&this.condition.equals(((Designations)another).condition)
+                &&((Designations)another).value==this.value
+                &&this.hashCode()==another.hashCode();
+    }
+    @Override
+    public int hashCode()
+    {
+        return value+(condition?0:1);
+    }
 }
